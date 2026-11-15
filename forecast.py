@@ -128,6 +128,33 @@ def tide_predictions(start_local, end_local):
     return out
 
 
+def tide_curves(start_local, end_local):
+    """Hourly predicted water level at Fort Point: {date: [[hour, ft], ...]} from sunrise to midnight."""
+    url = ('https://api.tidesandcurrents.noaa.gov/api/prod/datagetter?product=predictions&station=9414290'
+           f'&begin_date={start_local:%Y%m%d}&end_date={(end_local + timedelta(days=1)):%Y%m%d}&datum=MLLW&interval=h'
+           '&units=english&time_zone=lst_ldt&format=json&application=unicorn_beach')
+    try:
+        preds = json.loads(get(url))['predictions']
+    except Exception as e:
+        print('tide curve unavailable:', e, file=sys.stderr)
+        return {}
+    by_time = {datetime.strptime(p['t'], '%Y-%m-%d %H:%M'): float(p['v']) for p in preds}
+    out = {}
+    d = start_local
+    while d <= end_local:
+        rise = sunrise_local(d)
+        pts = []
+        for t in sorted(by_time):
+            if t.date() == d and t >= rise.replace(minute=0):
+                pts.append([t.hour, round(by_time[t], 2)])
+            elif t == datetime(d.year, d.month, d.day) + timedelta(days=1):
+                pts.append([24, round(by_time[t], 2)])  # midnight closes the curve
+        if pts:
+            out[d.isoformat()] = dict(points=pts, sunrise=round(rise.hour + rise.minute / 60, 2))
+        d += timedelta(days=1)
+    return out
+
+
 def active_alerts():
     try:
         feats = json.loads(get(f'https://api.weather.gov/alerts/active?point={LAT},{LON}'))['features']
@@ -249,8 +276,21 @@ def build(now=None):
             within_48h=(run[0]['t'] - now) <= timedelta(hours=48),
         ))
     tides = tide_predictions(now.astimezone(PT).date(), (now + timedelta(days=7)).astimezone(PT).date())
+    curves = tide_curves(now.astimezone(PT).date(), (now + timedelta(days=7)).astimezone(PT).date())
     for d in days:
         d['tides'] = tides.get(d['date'], [])
+        c = curves.get(d['date'])
+        if c:
+            d['tide_curve'] = c['points']
+            d['sunrise'] = c['sunrise']
+        hts = [t['ft'] for t in d['tides']]
+        highs = [t['ft'] for t in d['tides'] if t['type'] == 'high']
+        lows = [t['ft'] for t in d['tides'] if t['type'] == 'low']
+        if highs and lows:
+            d['tide_range'] = dict(ft=round(max(highs) - min(lows), 1), high=max(highs), low=min(lows))
+        elif d.get('tide_curve'):  # only highs or only lows after sunrise: use the curve's own swing
+            v = [p[1] for p in d['tide_curve']]
+            d['tide_range'] = dict(ft=round(max(v) - min(v), 1), high=round(max(v), 1), low=round(min(v), 1))
     return dict(
         generated=now.isoformat(), generated_local=now.astimezone(PT).strftime('%a %b %-d, %-I:%M %p'),
         definition=dict(wave_max_ft=round(WAVE_MAX_M * 3.281, 1), wind_max_mph=WIND_MAX_MPH,

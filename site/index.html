@@ -1,0 +1,218 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Unicorn Beach Day</title>
+<meta name="description" content="The chance of a glassy, windless, tiny-wave day at China Beach, San Francisco, this week.">
+<link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>🌊</text></svg>">
+<style>
+  :root {
+    --bg: #f6f1e7;           /* sand */
+    --surface: #fffdf8;
+    --ink: #17323a;          /* deep water */
+    --muted: #5d7177;
+    --line: #e2d9c8;
+    --sea: #2b8a9a;
+    --sea-soft: #d6ecee;
+    --glow: #f2a65a;         /* sunrise */
+    --warn: #b5543a;
+    --radius: 16px;
+  }
+  @media (prefers-color-scheme: dark) {
+    :root:not([data-theme="light"]) {
+      --bg: #0e1a1e; --surface: #142429; --ink: #e8f1f1; --muted: #93a8ad; --line: #22373d;
+      --sea: #5cc3d1; --sea-soft: #173a40; --glow: #f6b77a; --warn: #f08a6c;
+    }
+  }
+  * { box-sizing: border-box; }
+  body {
+    margin: 0; background: var(--bg); color: var(--ink);
+    font: 16px/1.5 -apple-system, BlinkMacSystemFont, "SF Pro Text", Inter, "Segoe UI", system-ui, sans-serif;
+  }
+  main { max-width: 760px; margin: 0 auto; padding: 32px 16px 64px; }
+  header p { margin: 0; color: var(--muted); }
+  h1 { font-size: clamp(28px, 6vw, 40px); letter-spacing: -0.02em; line-height: 1.1; margin: 4px 0 6px; }
+  .eyebrow { font-size: 13px; font-weight: 600; letter-spacing: .06em; text-transform: uppercase; color: var(--sea); }
+
+  .hero {
+    margin: 28px 0; padding: 28px; border-radius: var(--radius); background: var(--surface);
+    border: 1px solid var(--line); display: grid; grid-template-columns: auto 1fr; gap: 24px; align-items: center;
+  }
+  .ring { --p: 0; width: 140px; height: 140px; border-radius: 50%; display: grid; place-items: center;
+    background: conic-gradient(var(--glow) calc(var(--p) * 1%), var(--sea-soft) 0); }
+  .ring > div { width: 112px; height: 112px; border-radius: 50%; background: var(--surface); display: grid; place-items: center; text-align: center; }
+  .ring strong { font-size: 34px; letter-spacing: -0.03em; line-height: 1; }
+  .ring span { font-size: 12px; color: var(--muted); }
+  .hero h2 { margin: 0 0 6px; font-size: 22px; letter-spacing: -0.01em; }
+  .hero p { margin: 0; color: var(--muted); }
+  .hero.go { border-color: var(--glow); box-shadow: 0 0 0 3px color-mix(in srgb, var(--glow) 30%, transparent); }
+
+  .days { display: grid; gap: 10px; }
+  .day { display: grid; grid-template-columns: 96px 1fr 56px; gap: 14px; align-items: center;
+    padding: 14px 16px; background: var(--surface); border: 1px solid var(--line); border-radius: 12px; }
+  .day .name { font-weight: 600; }
+  .day .name small { display: block; font-weight: 400; color: var(--muted); font-size: 13px; }
+  .bar { height: 8px; border-radius: 99px; background: var(--sea-soft); overflow: hidden; margin-bottom: 8px; }
+  .bar i { display: block; height: 100%; background: var(--glow); min-width: 3px; border-radius: 99px; }
+  .facts { font-size: 13px; color: var(--muted); display: flex; flex-wrap: wrap; gap: 4px 12px; }
+  .facts b { color: var(--ink); font-weight: 600; }
+  .tag { color: var(--warn); font-weight: 600; }
+  .pct { text-align: right; font-weight: 700; font-size: 18px; font-variant-numeric: tabular-nums; }
+
+  section { margin-top: 40px; }
+  section h2 { font-size: 20px; margin: 0 0 10px; letter-spacing: -0.01em; }
+  .card { background: var(--surface); border: 1px solid var(--line); border-radius: var(--radius); padding: 20px; }
+  .rules { display: grid; grid-template-columns: repeat(3, 1fr); gap: 12px; margin: 14px 0; }
+  .rules div { background: var(--sea-soft); border-radius: 12px; padding: 12px; }
+  .rules strong { display: block; font-size: 22px; letter-spacing: -0.02em; }
+  .rules span { font-size: 13px; color: var(--muted); }
+  .muted { color: var(--muted); }
+
+  form { display: grid; gap: 12px; }
+  .row { display: flex; gap: 8px; flex-wrap: wrap; }
+  input[type=tel] { flex: 1 1 200px; height: 44px; padding: 0 14px; border-radius: 10px; border: 1px solid var(--line);
+    background: var(--bg); color: var(--ink); font: inherit; }
+  button { height: 44px; padding: 0 18px; border-radius: 10px; border: 0; background: var(--ink); color: var(--surface);
+    font: inherit; font-weight: 600; cursor: pointer; }
+  button:disabled { opacity: .5; cursor: default; }
+  label.consent { display: flex; gap: 10px; font-size: 13px; color: var(--muted); align-items: flex-start; }
+  .note { font-size: 14px; }
+  footer { margin-top: 48px; font-size: 13px; color: var(--muted); }
+  footer a { color: inherit; }
+
+  @media (max-width: 560px) {
+    .hero { grid-template-columns: 1fr; justify-items: start; padding: 20px; }
+    .day { grid-template-columns: 1fr 52px; }
+    .day .name { grid-column: 1 / -1; display: flex; gap: 8px; align-items: baseline; }
+    .day .name small { display: inline; }
+    .rules { grid-template-columns: 1fr; }
+  }
+</style>
+</head>
+<body>
+<main>
+  <header>
+    <div class="eyebrow">China Beach · San Francisco</div>
+    <h1>Unicorn Beach Day</h1>
+    <p>Glassy water, tiny waves, no wind. It happens about twice a year. When it does, play hooky.</p>
+  </header>
+
+  <div class="hero" id="hero">
+    <div class="ring" id="ring"><div><div><strong id="best-pct">–</strong><br><span>best chance</span></div></div></div>
+    <div>
+      <h2 id="hero-title">Checking the ocean…</h2>
+      <p id="hero-text"></p>
+    </div>
+  </div>
+
+  <div class="days" id="days" aria-live="polite"></div>
+
+  <section>
+    <h2>What's a unicorn day?</h2>
+    <div class="card">
+      <p style="margin:0">Three or more daylight hours in a row with:</p>
+      <div class="rules">
+        <div><strong>≤ 1 ft</strong><span>waves just off China Beach</span></div>
+        <div><strong>≤ 5.6 mph</strong><span>wind</span></div>
+        <div><strong>≤ 9 mph</strong><span>gusts</span></div>
+      </div>
+      <p class="muted" style="margin:0">From 2021 to 2025 this happened about twice a year, mostly October to January, usually in the morning when a small, long-period swell meets a calm high-pressure day.</p>
+    </div>
+  </section>
+
+  <section>
+    <h2>Get a text when one is coming</h2>
+    <div class="card">
+      <form id="signup">
+        <div class="row">
+          <input type="tel" name="phone" autocomplete="tel" inputmode="tel" placeholder="(415) 555-0123" aria-label="Mobile number" required>
+          <button type="submit">Text me</button>
+        </div>
+        <label class="consent"><input type="checkbox" name="consent" required> I agree to get automated texts from Unicorn Beach Day, about 2–4 a year. Message and data rates may apply. Reply STOP to unsubscribe.</label>
+        <p class="note muted" id="signup-note" style="margin:0"></p>
+      </form>
+    </div>
+  </section>
+
+  <footer>
+    <p id="updated"></p>
+    <p>Waves: <a href="https://cdip.ucsd.edu/">CDIP</a>, Scripps Institution of Oceanography, and <a href="https://open-meteo.com/">Open-Meteo</a> for days 4–7. Wind, rain and advisories: <a href="https://www.weather.gov/mtr/">National Weather Service</a>. Chances are estimates from forecasts, not guarantees. Always check conditions, currents and shorebreak on the beach yourself.</p>
+  </footer>
+</main>
+
+<script>
+  // Set this once a signup backend exists (see README). Until then the form explains it's coming.
+  const SIGNUP_ENDPOINT = '';
+
+  const pct = (p) => {
+    const v = p * 100;
+    return v >= 10 ? `${Math.round(v)}%` : v >= 1 ? `${v.toFixed(1)}%` : v > 0 ? '<1%' : '0%';
+  };
+
+  fetch('data.json', { cache: 'no-store' })
+    .then((r) => r.json())
+    .then((data) => {
+      const days = data.days || [];
+      const best = days.reduce((a, d) => (!a || d.chance > a.chance ? d : a), null);
+      const hero = document.getElementById('hero');
+      document.getElementById('ring').style.setProperty('--p', best ? Math.max(best.chance * 100, best.chance > 0 ? 2 : 0) : 0);
+      document.getElementById('best-pct').textContent = best ? pct(best.chance) : '–';
+
+      const title = document.getElementById('hero-title');
+      const text = document.getElementById('hero-text');
+      if (best && best.chance >= 0.5) {
+        hero.classList.add('go');
+        title.textContent = `Play hooky ${best.label}!`;
+        text.textContent = `${best.window}: about ${best.wave_ft} ft waves and ${best.wind_mph} mph wind. Get out there.`;
+      } else if (best && best.chance >= 0.1) {
+        title.textContent = `Worth watching: ${best.label}`;
+        text.textContent = `${best.window} looks closest: about ${best.wave_ft} ft waves, ${best.wind_mph} mph wind. Not a unicorn yet.`;
+      } else {
+        title.textContent = 'No unicorn this week';
+        text.textContent = best
+          ? `Closest is ${best.label}, ${best.window}: about ${best.wave_ft} ft waves and ${best.wind_mph} mph wind.`
+          : 'No forecast available right now.';
+      }
+
+      document.getElementById('days').innerHTML = days.map((d) => `
+        <div class="day">
+          <div class="name">${d.label.split(' ')[0]}<small>${d.label.split(' ').slice(1).join(' ')}</small></div>
+          <div>
+            <div class="bar"><i style="width:${Math.min(100, d.chance * 100)}%"></i></div>
+            <div class="facts">
+              <span>${d.window}</span>
+              <span>waves <b>${d.wave_ft} ft</b></span>
+              <span>wind <b>${d.wind_mph}</b>, gusts ${d.gust_mph} mph</span>
+              ${d.rain_pct >= 20 ? `<span>rain ${d.rain_pct}%</span>` : ''}
+              ${d.advisory.length ? `<span class="tag">${d.advisory.join(', ')}</span>` : ''}
+            </div>
+          </div>
+          <div class="pct">${pct(d.chance)}</div>
+        </div>`).join('');
+
+      document.getElementById('updated').textContent = `Updated ${data.generated_local} Pacific. Checks run every evening and early morning.`;
+    })
+    .catch(() => {
+      document.getElementById('hero-title').textContent = "Couldn't load the forecast";
+    });
+
+  const form = document.getElementById('signup');
+  const note = document.getElementById('signup-note');
+  if (!SIGNUP_ENDPOINT) note.textContent = 'Text sign-ups open soon.';
+  form.addEventListener('submit', async (e) => {
+    e.preventDefault();
+    if (!SIGNUP_ENDPOINT) { note.textContent = 'Text sign-ups open soon. Check back!'; return; }
+    const btn = form.querySelector('button');
+    btn.disabled = true;
+    try {
+      const res = await fetch(SIGNUP_ENDPOINT, { method: 'POST', headers: { 'Content-Type': 'application/json', Accept: 'application/json' },
+        body: JSON.stringify({ phone: form.phone.value, consent: form.consent.checked }) });
+      note.textContent = res.ok ? "You're in. We'll text you when a unicorn day is coming." : 'Something went wrong. Please try again.';
+      if (res.ok) form.reset();
+    } catch { note.textContent = 'Something went wrong. Please try again.'; }
+    btn.disabled = false;
+  });
+</script>
+</body>
+</html>

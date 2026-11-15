@@ -1,0 +1,47 @@
+name: Check for a unicorn beach day
+
+on:
+  schedule:
+    - cron: '17 1 * * *'   # ~5:17 pm Pacific (6:17 pm in summer): tomorrow's outlook
+    - cron: '17 13 * * *'  # ~5:17 am Pacific (6:17 am in summer): today's check
+  workflow_dispatch: {}
+
+permissions:
+  contents: write
+  pages: write
+  id-token: write
+
+concurrency:
+  group: unicorn
+  cancel-in-progress: false
+
+jobs:
+  check:
+    runs-on: ubuntu-latest
+    environment:
+      name: github-pages
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+      - name: Forecast and alert
+        env:
+          TWILIO_ACCOUNT_SID: ${{ secrets.TWILIO_ACCOUNT_SID }}
+          TWILIO_AUTH_TOKEN: ${{ secrets.TWILIO_AUTH_TOKEN }}
+          TWILIO_FROM: ${{ secrets.TWILIO_FROM }}
+          ALERT_NUMBERS: ${{ secrets.ALERT_NUMBERS }}
+          PAGE_URL: https://${{ github.repository_owner }}.github.io/${{ github.event.repository.name }}/
+        run: python forecast.py
+      - name: Save forecast and alert history
+        run: |
+          git config user.name "unicorn-bot"
+          git config user.email "unicorn-bot@users.noreply.github.com"
+          git add site/data.json state.json
+          git diff --cached --quiet || git commit -m "Forecast update"
+          git push
+      - uses: actions/configure-pages@v5
+      - uses: actions/upload-pages-artifact@v3
+        with:
+          path: site
+      - uses: actions/deploy-pages@v4

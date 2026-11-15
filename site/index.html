@@ -61,6 +61,7 @@
   .pct { text-align: right; font-weight: 700; font-size: 18px; font-variant-numeric: tabular-nums; }
 
   section { margin-top: 40px; }
+  section.signup { margin: 0 0 28px; }
   section h2 { font-size: 20px; margin: 0 0 10px; letter-spacing: -0.01em; }
   .card { background: var(--surface); border: 1px solid var(--line); border-radius: var(--radius); padding: 20px; }
   .rules { display: grid; grid-template-columns: repeat(3, 1fr); gap: 12px; margin: 14px 0; }
@@ -105,6 +106,20 @@
     </div>
   </div>
 
+  <section class="signup">
+    <h2>Get an email when one is coming</h2>
+    <div class="card">
+      <form id="signup">
+        <div class="row">
+          <input type="email" name="email" autocomplete="email" placeholder="you@example.com" aria-label="Email address" required>
+          <button type="submit">Email me</button>
+        </div>
+        <p class="muted" style="margin:0;font-size:13px">About two emails a year, only when a unicorn day is coming. Reply "stop" anytime to unsubscribe.</p>
+        <p class="note muted" id="signup-note" style="margin:0"></p>
+      </form>
+    </div>
+  </section>
+
   <div class="days" id="days" aria-live="polite"></div>
 
   <section>
@@ -120,19 +135,6 @@
     </div>
   </section>
 
-  <section>
-    <h2>Get an email when one is coming</h2>
-    <div class="card">
-      <form id="signup">
-        <div class="row">
-          <input type="email" name="email" autocomplete="email" placeholder="you@example.com" aria-label="Email address" required>
-          <button type="submit">Email me</button>
-        </div>
-        <p class="muted" style="margin:0;font-size:13px">About two emails a year, only when a unicorn day is coming. Reply "stop" anytime to unsubscribe.</p>
-        <p class="note muted" id="signup-note" style="margin:0"></p>
-      </form>
-    </div>
-  </section>
 
   <footer>
     <p id="updated"></p>

@@ -111,7 +111,7 @@
   </div>
 
   <section class="signup">
-    <h2>Get an email when one is coming</h2>
+    <h2 id="signup-title">Get an email when one is coming</h2>
     <div class="card">
       <form id="signup">
         <div class="row">
@@ -221,12 +221,14 @@
     document.getElementById('signed-up-email').textContent =
       emails.length > 2 ? `${emails.slice(0, -1).join(', ')} and ${emails.at(-1)}` : emails.join(' and ');
     form.hidden = true;
+    document.getElementById('signup-title').hidden = true;
     done.hidden = false;
     if (focus) done.querySelector('.done').focus();
   };
   if (saved().length) showDone(saved(), false);
   document.getElementById('add-another').addEventListener('click', () => {
     done.hidden = true;
+    document.getElementById('signup-title').hidden = false;
     form.hidden = false;
     form.email.focus();
   });

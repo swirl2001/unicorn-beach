@@ -107,6 +107,25 @@ def offshore_waves():
             for t, h in zip(d['time'], d['wave_height']) if h is not None}
 
 
+def tide_predictions(start_local, end_local):
+    """NOAA high/low tide predictions at Fort Point (Golden Gate), feet above MLLW, local time."""
+    url = ('https://api.tidesandcurrents.noaa.gov/api/prod/datagetter?product=predictions&station=9414290'
+           f'&begin_date={start_local:%Y%m%d}&end_date={end_local:%Y%m%d}&datum=MLLW&interval=hilo'
+           '&units=english&time_zone=lst_ldt&format=json&application=unicorn_beach')
+    try:
+        preds = json.loads(get(url))['predictions']
+    except Exception as e:  # tides are a bonus; never block the forecast
+        print('tides unavailable:', e, file=sys.stderr)
+        return {}
+    out = {}
+    for p in preds:
+        t = datetime.strptime(p['t'], '%Y-%m-%d %H:%M')
+        out.setdefault(t.date().isoformat(), []).append(dict(
+            time=t.strftime('%-I:%M%p').lower().replace(':00', ''), type='high' if p['type'] == 'H' else 'low',
+            ft=round(float(p['v']), 1)))
+    return out
+
+
 def active_alerts():
     try:
         feats = json.loads(get(f'https://api.weather.gov/alerts/active?point={LAT},{LON}'))['features']
@@ -217,6 +236,9 @@ def build(now=None):
             advisory=sorted({b for r in run for b in r['blocked']}),
             within_48h=(run[0]['t'] - now) <= timedelta(hours=48),
         ))
+    tides = tide_predictions(now.astimezone(PT).date(), (now + timedelta(days=7)).astimezone(PT).date())
+    for d in days:
+        d['tides'] = tides.get(d['date'], [])
     return dict(
         generated=now.isoformat(), generated_local=now.astimezone(PT).strftime('%a %b %-d, %-I:%M %p'),
         definition=dict(wave_max_ft=round(WAVE_MAX_M * 3.281, 1), wind_max_mph=WIND_MAX_MPH,

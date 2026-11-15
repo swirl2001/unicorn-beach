@@ -66,6 +66,21 @@
   .facts svg { width: 14px; height: 14px; flex: none; color: var(--sea); }
   .facts .win { font-size: 12px; margin-bottom: 2px; }
   .facts .tag, .facts .tag svg { color: var(--warn); font-weight: 600; }
+  .tides { display: grid; grid-template-columns: repeat(7, minmax(0, 1fr)); background: var(--surface);
+    border: 1px solid var(--line); border-radius: var(--radius); overflow: hidden; }
+  .tide-day { padding: 14px 6px 16px; border-right: 1px solid var(--line); text-align: center; min-width: 0; }
+  .tide-day:last-child { border-right: 0; }
+  .tide-day .name b { display: block; font-size: 12px; letter-spacing: .1em; text-transform: uppercase; }
+  .tide-day .name small { display: block; font-size: 12px; color: var(--muted); margin-bottom: 8px; }
+  .tide-list { display: grid; gap: 6px; font-size: 13px; }
+  .tide { display: grid; justify-items: center; line-height: 1.25; }
+  .tide .when { display: inline-flex; align-items: center; gap: 4px; font-weight: 600; white-space: nowrap; }
+  .tide .when svg { width: 12px; height: 12px; }
+  .tide.high .when svg { color: var(--sea); }
+  .tide.low .when svg { color: var(--glow); }
+  .tide .ht { font-size: 12px; color: var(--muted); }
+  .tides-section { margin-top: 32px; }
+  .legend a { color: inherit; }
   .legend { display: flex; flex-wrap: wrap; gap: 6px 16px; justify-content: center; margin: 10px 0 0; font-size: 12px; color: var(--muted); }
   .legend span { display: inline-flex; align-items: center; gap: 5px; }
   .legend svg { width: 13px; height: 13px; color: var(--sea); }
@@ -89,13 +104,20 @@
   button:disabled { opacity: .5; cursor: default; }
     .note { font-size: 14px; }
   .signed-up { display: grid; gap: 6px; justify-items: start; }
-  .signed-up[hidden], form[hidden] { display: none; }
+  .signed-up[hidden], form[hidden], section[hidden] { display: none; }
   .done { margin: 0; font-size: 22px; font-weight: 700; letter-spacing: -0.01em; outline: none; }
   button.link { height: auto; padding: 4px 0; background: none; color: var(--sea); font-weight: 600; text-decoration: underline; text-underline-offset: 3px; }
   footer { margin-top: 48px; font-size: 13px; color: var(--muted); }
   footer a { color: inherit; }
 
   @media (max-width: 700px) {
+    .tides { grid-template-columns: 1fr; }
+    .tide-day { display: grid; grid-template-columns: 64px 1fr; gap: 12px; align-items: center; text-align: left;
+      border-right: 0; border-bottom: 1px solid var(--line); padding: 10px 14px; }
+    .tide-day:last-child { border-bottom: 0; }
+    .tide-day .name small { margin-bottom: 0; }
+    .tide-list { grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 8px 12px; }
+    .tide { justify-items: start; }
     .days { grid-template-columns: 1fr; }
     .day { display: grid; grid-template-columns: 64px 1fr 52px; align-items: center; gap: 6px 12px; text-align: left;
       border-right: 0; border-bottom: 1px solid var(--line); padding: 12px 14px; }
@@ -150,6 +172,12 @@
   <div class="days" id="days" aria-live="polite"></div>
   <p class="legend" id="legend" hidden></p>
 
+  <section class="tides-section" id="tides-section" hidden>
+    <h2>Tides</h2>
+    <div class="tides" id="tides"></div>
+    <p class="legend">High and low tide predictions at Fort Point (Golden Gate), feet above mean lower low water. <a href="https://tidesandcurrents.noaa.gov/stationhome.html?id=9414290">NOAA</a></p>
+  </section>
+
   <section>
     <h2>What's a unicorn day?</h2>
     <div class="card">
@@ -180,6 +208,8 @@
     wind: svg('<path d="M2 6h8.5a2 2 0 1 0-2-2"/><path d="M2 10h10.5a2 2 0 1 1-2 2"/>'),
     gust: svg('<path d="M2 4.5h7"/><path d="M2 8h12"/><path d="M2 11.5h8"/><path d="M11.5 6l2.5 2-2.5 2"/>'),
     rain: svg('<path d="M8 2s4 4.6 4 7.6A4 4 0 0 1 4 9.6C4 6.6 8 2 8 2z"/>'),
+    up: svg('<path d="M8 13V3"/><path d="M4 7l4-4 4 4"/>'),
+    down: svg('<path d="M8 3v10"/><path d="M4 9l4 4 4-4"/>'),
     warn: svg('<path d="M8 2.5l6 10.5H2z"/><path d="M8 7v2.5"/><path d="M8 11.4v.1"/>'),
   };
   // Bar fill on a square-root scale so small chances still show, and differ: 1% -> 10%, 25% -> 50%. 0 -> empty.
@@ -235,6 +265,23 @@
       const legend = document.getElementById('legend');
       legend.innerHTML = `<span>${ICON.wave}Waves</span><span>${ICON.wind}Wind</span><span>${ICON.gust}Gusts</span><span>${ICON.rain}Rain chance</span>`;
       legend.hidden = false;
+
+      if (days.some((d) => d.tides && d.tides.length)) {
+        document.getElementById('tides').innerHTML = days.map((d) => {
+          const [dow, ...rest] = d.label.split(' ');
+          return `
+          <div class="tide-day">
+            <div class="name"><b>${dow}</b><small>${rest.join(' ')}</small></div>
+            <div class="tide-list">${(d.tides || []).map((t) => `
+              <div class="tide ${t.type}" aria-label="${t.type} tide ${t.time}, ${t.ft} feet">
+                <span class="when">${t.type === 'high' ? ICON.up : ICON.down}${t.time}</span>
+                <span class="ht">${t.type === 'high' ? 'High' : 'Low'} ${t.ft} ft</span>
+              </div>`).join('')}
+            </div>
+          </div>`;
+        }).join('');
+        document.getElementById('tides-section').hidden = false;
+      }
 
       document.getElementById('updated').textContent = `Updated ${data.generated_local} Pacific. Checks run every evening and early morning.`;
     })

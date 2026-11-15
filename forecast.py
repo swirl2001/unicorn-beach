@@ -13,7 +13,7 @@ Email alerts need these environment variables (GitHub Actions secrets):
   ALERT_EMAILS (comma-separated; everyone is sent the alert in BCC).
 Without them it prints the message instead of sending.
 """
-import json, math, os, re, smtplib, sys, urllib.request
+import json, math, os, re, smtplib, sys, time, urllib.request
 from email.message import EmailMessage
 from datetime import datetime, timedelta, timezone
 from pathlib import Path
@@ -40,10 +40,16 @@ MARINE = ('https://marine-api.open-meteo.com/v1/marine?latitude=37.78&longitude=
           '&hourly=wave_height&timezone=UTC&forecast_days=8')
 
 
-def get(url, headers=UA):
-    req = urllib.request.Request(url, headers=headers)
-    with urllib.request.urlopen(req, timeout=60) as r:
-        return r.read().decode()
+def get(url, headers=UA, tries=4):
+    for i in range(tries):  # data servers (CDIP, NWS) refuse or time out now and then; wait and retry
+        try:
+            req = urllib.request.Request(url, headers=headers)
+            with urllib.request.urlopen(req, timeout=60) as r:
+                return r.read().decode()
+        except Exception:
+            if i == tries - 1:
+                raise
+            time.sleep(15 * (i + 1))
 
 
 def phi(x):

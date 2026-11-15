@@ -51,8 +51,10 @@
   /* Week: a row of 7 columns when there's room, a stacked list on phones */
   .days { display: grid; grid-template-columns: repeat(7, minmax(0, 1fr)); background: var(--surface);
     border: 1px solid var(--line); border-radius: var(--radius); overflow: hidden; }
-  .day { display: flex; flex-direction: column; align-items: center; gap: 8px; padding: 16px 6px 18px;
-    border-right: 1px solid var(--line); text-align: center; min-width: 0; }
+  /* Each day spans 5 shared rows (subgrid) so synopses and icon lists line up across the week */
+  .day { display: grid; grid-row: span 5; grid-template-rows: subgrid; row-gap: 8px; align-items: start; justify-items: center;
+    padding: 16px 6px 18px; border-right: 1px solid var(--line); text-align: center; min-width: 0; }
+  .day .note { font-size: 12px; line-height: 1.35; color: var(--ink); }
   .day:last-child { border-right: 0; }
   .day.best { background: color-mix(in srgb, var(--glow) 14%, var(--surface)); }
   .day .name b { display: block; font-size: 12px; letter-spacing: .1em; text-transform: uppercase; }
@@ -60,11 +62,11 @@
   .meter { position: relative; width: 12px; height: 72px; border-radius: 99px; background: var(--sea-soft); overflow: hidden; }
   .meter i { position: absolute; left: 0; right: 0; bottom: 0; height: calc(var(--p) * 1%); background: var(--glow); border-radius: 99px; }
   .pct { font-weight: 700; font-size: 18px; font-variant-numeric: tabular-nums; }
-  .facts { display: grid; gap: 4px; font-size: 13px; color: var(--muted); justify-items: center; }
+  .facts { display: grid; gap: 4px; font-size: 13px; color: var(--muted); justify-content: center; justify-items: start; }
   .facts span { display: inline-flex; align-items: center; gap: 5px; white-space: nowrap; }
   .facts b { color: var(--ink); font-weight: 600; }
   .facts svg { width: 14px; height: 14px; flex: none; color: var(--sea); }
-  .facts .win { font-size: 12px; margin-bottom: 2px; }
+  .facts .win { font-size: 12px; margin-bottom: 2px; justify-self: center; }
   .facts .tag, .facts .tag svg { color: var(--warn); font-weight: 600; }
   .tides { display: grid; grid-template-columns: repeat(7, minmax(0, 1fr)); background: var(--surface);
     border: 1px solid var(--line); border-radius: var(--radius); overflow: hidden; }
@@ -131,13 +133,14 @@
     .tide-chart { margin-top: 4px; }
     .tide-range { margin-top: 0; }
     .days { grid-template-columns: 1fr; }
-    .day { display: grid; grid-template-columns: 64px 1fr 52px; align-items: center; gap: 6px 12px; text-align: left;
+    .day { grid-row: auto; grid-template-rows: none; justify-items: stretch; display: grid; grid-template-columns: 64px 1fr 52px; align-items: center; gap: 6px 12px; text-align: left;
       border-right: 0; border-bottom: 1px solid var(--line); padding: 12px 14px; }
     .day:last-child { border-bottom: 0; }
     .meter { width: auto; height: 8px; }
     .meter i { top: 0; right: auto; height: auto; width: calc(var(--p) * 1%); }
     .pct { text-align: right; }
-    .facts { grid-column: 2 / -1; display: flex; flex-wrap: wrap; gap: 4px 12px; justify-items: start; }
+    .day .note { grid-column: 2 / -1; }
+    .facts { grid-column: 2 / -1; display: flex; flex-wrap: wrap; gap: 4px 12px; justify-content: flex-start; }
     .facts .win { margin: 0; font-size: 13px; }
   }
   @media (max-width: 560px) {
@@ -258,6 +261,18 @@
           : 'No forecast available right now.';
       }
 
+      // One-line daily synopsis from the day's best window
+      const synopsis = (d) => {
+        if (d.chance >= 0.5) return 'Glassy and calm. Go!';
+        const waves = d.wave_ft <= 1 ? 'tiny waves' : d.wave_ft <= 2.5 ? 'small waves' : d.wave_ft <= 5 ? 'big surf' : 'huge surf';
+        const wind = d.wind_mph <= 5.6 && d.gust_mph <= 8.9 ? 'calm wind' : d.wind_mph <= 12 ? 'breezy' : 'windy';
+        const bits = [];
+        if (d.advisory.length) bits.push('surf advisory');
+        if (d.rain_pct >= 50) bits.push('rain likely');
+        bits.push(waves, wind);
+        const text = bits.slice(0, 3).join(', ');
+        return text.charAt(0).toUpperCase() + text.slice(1);
+      };
       const bestDay = days.reduce((a, d) => (!a || d.chance > a.chance ? d : a), null);
       document.getElementById('days').innerHTML = days.map((d) => {
         const [dow, ...rest] = d.label.split(' ');
@@ -266,6 +281,7 @@
           <div class="name"><b>${dow}</b><small>${rest.join(' ')}</small></div>
           <div class="meter" role="img" aria-label="${pct(d.chance)} chance"><i style="--p:${barFill(d.chance)}"></i></div>
           <div class="pct">${pct(d.chance)}</div>
+          <div class="note">${synopsis(d)}</div>
           <div class="facts">
             <span class="win">${d.window}</span>
             <span title="Waves off China Beach" aria-label="Waves ${d.wave_ft} feet">${ICON.wave}<b>${d.wave_ft} ft</b></span>

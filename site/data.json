@@ -1,6 +1,6 @@
 {
- "generated": "2026-11-15T06:54:05.202149+00:00",
- "generated_local": "Sat Nov 14, 10:54 PM",
+ "generated": "2026-11-15T07:42:15.022730+00:00",
+ "generated_local": "Sat Nov 14, 11:42 PM",
  "definition": {
   "wave_max_ft": 1.0,
   "wind_max_mph": 5.6,
@@ -17,7 +17,7 @@
    "wave_ft": 3.0,
    "wind_mph": 16,
    "gust_mph": 21,
-   "rain_pct": 26,
+   "rain_pct": 19,
    "wave_source": "cdip",
    "advisory": [
     "Small Craft Advisory"
@@ -32,7 +32,7 @@
    "wave_ft": 3.2,
    "wind_mph": 10,
    "gust_mph": 14,
-   "rain_pct": 22,
+   "rain_pct": 11,
    "wave_source": "cdip",
    "advisory": [],
    "within_48h": true
@@ -45,7 +45,7 @@
    "wave_ft": 2.5,
    "wind_mph": 12,
    "gust_mph": 14,
-   "rain_pct": 4,
+   "rain_pct": 8,
    "wave_source": "cdip",
    "advisory": [],
    "within_48h": false
@@ -58,7 +58,7 @@
    "wave_ft": 4.6,
    "wind_mph": 25,
    "gust_mph": 36,
-   "rain_pct": 90,
+   "rain_pct": 97,
    "wave_source": "offshore",
    "advisory": [],
    "within_48h": false
@@ -69,9 +69,9 @@
    "chance": 0.0,
    "window": "2pm\u20135pm",
    "wave_ft": 4.0,
-   "wind_mph": 23,
-   "gust_mph": 30,
-   "rain_pct": 74,
+   "wind_mph": 30,
+   "gust_mph": 32,
+   "rain_pct": 85,
    "wave_source": "offshore",
    "advisory": [],
    "within_48h": false
@@ -79,12 +79,12 @@
   {
    "date": "2026-11-20",
    "label": "Fri Nov 20",
-   "chance": 0.025,
+   "chance": 0.024,
    "window": "2pm\u20135pm",
    "wave_ft": 1.7,
    "wind_mph": 5,
    "gust_mph": 7,
-   "rain_pct": 13,
+   "rain_pct": 16,
    "wave_source": "offshore",
    "advisory": [],
    "within_48h": false
@@ -97,7 +97,7 @@
    "wave_ft": 1.3,
    "wind_mph": 9,
    "gust_mph": 12,
-   "rain_pct": 21,
+   "rain_pct": 19,
    "wave_source": "offshore",
    "advisory": [],
    "within_48h": false
@@ -112,6 +112,6 @@
  ],
  "sources": {
   "cdip_hours": 16,
-  "nws_updated": "2026-11-15T04:38:48+00:00"
+  "nws_updated": "2026-11-15T06:26:48+00:00"
  }
 }

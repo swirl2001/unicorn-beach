@@ -120,6 +120,8 @@ def tide_predictions(start_local, end_local):
     out = {}
     for p in preds:
         t = datetime.strptime(p['t'], '%Y-%m-%d %H:%M')
+        if t < sunrise_local(t.date()):  # skip tides between midnight and sunrise
+            continue
         out.setdefault(t.date().isoformat(), []).append(dict(
             time=t.strftime('%-I:%M%p').lower().replace(':00', ''), type='high' if p['type'] == 'H' else 'low',
             ft=round(float(p['v']), 1)))
@@ -143,7 +145,7 @@ def active_alerts():
 
 # ---------- the model ----------
 
-def sun_up(dt_utc):
+def sun_up(dt_utc, min_elev=3):
     doy = dt_utc.timetuple().tm_yday
     g = 2 * math.pi / 365 * (doy - 1 + (dt_utc.hour - 12) / 24)
     decl = (0.006918 - 0.399912 * math.cos(g) + 0.070257 * math.sin(g) - 0.006758 * math.cos(2 * g)
@@ -153,7 +155,17 @@ def sun_up(dt_utc):
     ha = math.radians((dt_utc.hour * 60 + dt_utc.minute + eqt + 4 * LON) / 4 - 180)
     lat = math.radians(LAT)
     elev = math.asin(math.sin(lat) * math.sin(decl) + math.cos(lat) * math.cos(decl) * math.cos(ha))
-    return math.degrees(elev) >= 3
+    return math.degrees(elev) >= min_elev
+
+
+def sunrise_local(day):
+    """Local sunrise (sun at the horizon) for a date, to the nearest 5 minutes."""
+    t = datetime(day.year, day.month, day.day, 4, tzinfo=PT)
+    while t.hour < 10:
+        if sun_up(t.astimezone(timezone.utc), min_elev=-0.8):
+            return t.replace(tzinfo=None)
+        t += timedelta(minutes=5)
+    return datetime(day.year, day.month, day.day, 7)
 
 
 def interp(series, t):

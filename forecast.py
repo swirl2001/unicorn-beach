@@ -216,7 +216,9 @@ def build(now=None):
 
     hours = []
     t = hour_floor(now) + timedelta(hours=1)
-    end = now + timedelta(days=7)
+    # exactly 7 calendar days: today through day 7, ending at local midnight (not 7x24 h from now)
+    today = now.astimezone(PT).date()
+    end = datetime(today.year, today.month, today.day, tzinfo=PT) + timedelta(days=7)
     while t < end:
         mid = t + timedelta(minutes=30)
         if sun_up(mid) and t in wind:
@@ -275,8 +277,8 @@ def build(now=None):
             advisory=sorted({b for r in run for b in r['blocked']}),
             within_48h=(run[0]['t'] - now) <= timedelta(hours=48),
         ))
-    tides = tide_predictions(now.astimezone(PT).date(), (now + timedelta(days=7)).astimezone(PT).date())
-    curves = tide_curves(now.astimezone(PT).date(), (now + timedelta(days=7)).astimezone(PT).date())
+    tides = tide_predictions(now.astimezone(PT).date(), today + timedelta(days=6))
+    curves = tide_curves(now.astimezone(PT).date(), today + timedelta(days=6))
     for d in days:
         d['tides'] = tides.get(d['date'], [])
         c = curves.get(d['date'])

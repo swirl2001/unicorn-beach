@@ -224,8 +224,10 @@
     down: svg('<path d="M8 3v10"/><path d="M4 9l4 4 4-4"/>'),
     warn: svg('<path d="M8 2.5l6 10.5H2z"/><path d="M8 7v2.5"/><path d="M8 11.4v.1"/>'),
   };
-  // Bar fill on a square-root scale so small chances still show, and differ: 1% -> 10%, 25% -> 50%. 0 -> empty.
-  const fill = (p) => (p > 0 ? Math.min(100, Math.sqrt(p) * 100) : 0);
+  // Ring: true to scale (10% fills a tenth), at least a thin 2% sliver above zero; 0 stays empty.
+  const fill = (p) => (p > 0 ? Math.min(100, Math.max(2, p * 100)) : 0);
+  // Day bars: gentle curve so small chances still differ (2% -> 6%, 10% -> 20%, 50% -> 62%, 100% -> 100%).
+  const barFill = (p) => (p > 0 ? Math.min(100, Math.max(3, Math.pow(p, 0.7) * 100)) : 0);
   const pct = (p) => {
     const v = p * 100;
     return v >= 10 ? `${Math.round(v)}%` : v >= 1 ? `${v.toFixed(1)}%` : v > 0 ? '<1%' : '0%';
@@ -262,7 +264,7 @@
         return `
         <div class="day${d === bestDay && d.chance >= 0.1 ? ' best' : ''}">
           <div class="name"><b>${dow}</b><small>${rest.join(' ')}</small></div>
-          <div class="meter" role="img" aria-label="${pct(d.chance)} chance"><i style="--p:${fill(d.chance)}"></i></div>
+          <div class="meter" role="img" aria-label="${pct(d.chance)} chance"><i style="--p:${barFill(d.chance)}"></i></div>
           <div class="pct">${pct(d.chance)}</div>
           <div class="facts">
             <span class="win">${d.window}</span>

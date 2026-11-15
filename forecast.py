@@ -5,14 +5,16 @@ Estimates, for each of the next 7 days, the chance of a "unicorn" window:
 wind of 5.6 mph or less and gusts of 8.9 mph or less. Historically (2021–2025)
 that happened about twice a year.
 
-Writes site/data.json for the web page and sends a text alert when a unicorn
+Writes site/data.json for the web page and sends an email alert when a unicorn
 day looks likely within 48 hours. Standard library only.
 
-Text alerts need these environment variables (GitHub Actions secrets):
-  TWILIO_ACCOUNT_SID, TWILIO_AUTH_TOKEN, TWILIO_FROM, ALERT_NUMBERS (comma-separated, +1...)
+Email alerts need these environment variables (GitHub Actions secrets):
+  GMAIL_USER (the sending Gmail address), GMAIL_APP_PASSWORD (a Google app password),
+  ALERT_EMAILS (comma-separated; everyone is sent the alert in BCC).
 Without them it prints the message instead of sending.
 """
-import base64, json, math, os, re, sys, urllib.parse, urllib.request
+import json, math, os, re, smtplib, sys, urllib.request
+from email.message import EmailMessage
 from datetime import datetime, timedelta, timezone
 from pathlib import Path
 from zoneinfo import ZoneInfo
@@ -226,20 +228,20 @@ def build(now=None):
 
 # ---------- alerts ----------
 
-def send_texts(message):
-    sid, token = os.environ.get('TWILIO_ACCOUNT_SID'), os.environ.get('TWILIO_AUTH_TOKEN')
-    sender, numbers = os.environ.get('TWILIO_FROM'), os.environ.get('ALERT_NUMBERS', '')
-    numbers = [n.strip() for n in numbers.split(',') if n.strip()]
-    if not (sid and token and sender and numbers):
-        print('[dry run, no Twilio settings] would text:', message)
+def send_emails(subject, body):
+    user, password = os.environ.get('GMAIL_USER'), os.environ.get('GMAIL_APP_PASSWORD')
+    recipients = [e.strip() for e in os.environ.get('ALERT_EMAILS', '').split(',') if e.strip()]
+    if not (user and password and recipients):
+        print('[dry run, no Gmail settings] would email:', subject, '|', body)
         return False
-    auth = base64.b64encode(f'{sid}:{token}'.encode()).decode()
-    for n in numbers:
-        body = urllib.parse.urlencode({'To': n, 'From': sender, 'Body': message}).encode()
-        req = urllib.request.Request(f'https://api.twilio.com/2010-04-01/Accounts/{sid}/Messages.json',
-                                     data=body, headers={'Authorization': f'Basic {auth}'})
-        urllib.request.urlopen(req, timeout=30).read()
-    print(f'texted {len(numbers)} number(s)')
+    msg = EmailMessage()
+    msg['Subject'], msg['From'], msg['To'] = subject, f'Unicorn Beach Day <{user}>', user
+    msg['Bcc'] = ', '.join(recipients)
+    msg.set_content(body)
+    with smtplib.SMTP_SSL('smtp.gmail.com', 465, timeout=30) as smtp:
+        smtp.login(user, password)
+        smtp.send_message(msg)
+    print(f'emailed {len(recipients)} address(es)')
     return True
 
 
@@ -253,10 +255,15 @@ def main():
     page = os.environ.get('PAGE_URL', '')
     for d in data['days']:
         if d['within_48h'] and d['chance'] >= ALERT_CHANCE and d['date'] not in state['alerted']:
-            msg = (f"Play hooky! China Beach looks like a unicorn day {d['label']}, {d['window']}: "
-                   f"~{d['wave_ft']} ft waves, wind {d['wind_mph']} mph. Chance {round(d['chance'] * 100)}%. "
-                   f"{page}".strip())
-            if send_texts(msg) or os.environ.get('MARK_DRY_RUN'):
+            subject = f"Play hooky {d['label']}: China Beach looks like a unicorn day"
+            body = (f"China Beach looks glassy {d['label']}, {d['window']}.\n\n"
+                    f"Waves about {d['wave_ft']} ft, wind {d['wind_mph']} mph, gusts {d['gust_mph']} mph. "
+                    f"Chance {round(d['chance'] * 100)}%.\n\n"
+                    f"This happens about twice a year. Drop everything and get out there.\n\n"
+                    f"{page}\n\n"
+                    "Check currents and shorebreak on the beach yourself; this is a forecast, not a safety call.\n"
+                    "Reply 'stop' to unsubscribe.")
+            if send_emails(subject, body) or os.environ.get('MARK_DRY_RUN'):
                 state['alerted'].append(d['date'])
     state['alerted'] = sorted(set(state['alerted']))[-50:]
     state_path.write_text(json.dumps(state, indent=1))

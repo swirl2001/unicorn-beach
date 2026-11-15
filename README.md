@@ -1,6 +1,6 @@
 # Unicorn Beach Day
 
-A web page and text alert for the rare perfect day at China Beach, San Francisco:
+A web page and email alert for the rare perfect day at China Beach, San Francisco:
 3+ daylight hours with waves of 1 ft or less, wind of 5.6 mph or less and gusts of 8.9 mph or less.
 From 2021 to 2025 that happened about twice a year.
 
@@ -13,7 +13,7 @@ From 2021 to 2025 that happened about twice a year.
 2. For days 4–7, estimates China Beach waves as 0.37 × the Open-Meteo offshore forecast
    (the median ratio of China Beach to the Bar buoy, 2021–2025).
 3. Scores each daylight hour, finds each day's best 3-hour window, and writes `site/data.json`.
-4. Texts everyone in `ALERT_NUMBERS` once per date when a day within 48 hours reaches a 50% chance.
+4. Emails everyone in `ALERT_EMAILS` (in BCC) once per date when a day within 48 hours reaches a 50% chance.
 
 The web page in `site/` reads `data.json` and is published with GitHub Pages.
 
@@ -26,14 +26,16 @@ GitHub repository secrets:
 
 | Secret | Value |
 | --- | --- |
-| `TWILIO_ACCOUNT_SID` | From the Twilio console |
-| `TWILIO_AUTH_TOKEN` | From the Twilio console |
-| `TWILIO_FROM` | Your Twilio number, e.g. `+18885550123` |
-| `ALERT_NUMBERS` | Comma-separated numbers in `+1…` format |
+| `GMAIL_USER` | The Gmail address that sends alerts |
+| `GMAIL_APP_PASSWORD` | A Google app password (myaccount.google.com/apppasswords; needs 2-Step Verification) |
+| `ALERT_EMAILS` | Comma-separated list of everyone who gets alerts |
+
+Sign-ups: create a Formspree form, put its endpoint in `SIGNUP_ENDPOINT` in `site/index.html`,
+and add new addresses from Formspree to `ALERT_EMAILS`. Remove anyone who replies "stop".
 
 Then enable GitHub Pages with "GitHub Actions" as the source, and run the workflow once by hand.
 
-Run locally: `python3 forecast.py` (prints the message instead of texting when secrets are missing).
+Run locally: `python3 forecast.py` (prints the email instead of sending when secrets are missing).
 
 ## Background research
 

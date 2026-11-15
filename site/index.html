@@ -71,13 +71,12 @@
 
   form { display: grid; gap: 12px; }
   .row { display: flex; gap: 8px; flex-wrap: wrap; }
-  input[type=tel] { flex: 1 1 200px; height: 44px; padding: 0 14px; border-radius: 10px; border: 1px solid var(--line);
+  input[type=email] { flex: 1 1 200px; height: 44px; padding: 0 14px; border-radius: 10px; border: 1px solid var(--line);
     background: var(--bg); color: var(--ink); font: inherit; }
   button { height: 44px; padding: 0 18px; border-radius: 10px; border: 0; background: var(--ink); color: var(--surface);
     font: inherit; font-weight: 600; cursor: pointer; }
   button:disabled { opacity: .5; cursor: default; }
-  label.consent { display: flex; gap: 10px; font-size: 13px; color: var(--muted); align-items: flex-start; }
-  .note { font-size: 14px; }
+    .note { font-size: 14px; }
   footer { margin-top: 48px; font-size: 13px; color: var(--muted); }
   footer a { color: inherit; }
 
@@ -122,14 +121,14 @@
   </section>
 
   <section>
-    <h2>Get a text when one is coming</h2>
+    <h2>Get an email when one is coming</h2>
     <div class="card">
       <form id="signup">
         <div class="row">
-          <input type="tel" name="phone" autocomplete="tel" inputmode="tel" placeholder="(415) 555-0123" aria-label="Mobile number" required>
-          <button type="submit">Text me</button>
+          <input type="email" name="email" autocomplete="email" placeholder="you@example.com" aria-label="Email address" required>
+          <button type="submit">Email me</button>
         </div>
-        <label class="consent"><input type="checkbox" name="consent" required> I agree to get automated texts from Unicorn Beach Day, about 2–4 a year. Message and data rates may apply. Reply STOP to unsubscribe.</label>
+        <p class="muted" style="margin:0;font-size:13px">About two emails a year, only when a unicorn day is coming. Reply "stop" anytime to unsubscribe.</p>
         <p class="note muted" id="signup-note" style="margin:0"></p>
       </form>
     </div>
@@ -142,7 +141,7 @@
 </main>
 
 <script>
-  // Set this once a signup backend exists (see README). Until then the form explains it's coming.
+  // Formspree form that collects sign-up emails (see README). Empty = sign-ups not open yet.
   const SIGNUP_ENDPOINT = '';
 
   const pct = (p) => {
@@ -199,16 +198,16 @@
 
   const form = document.getElementById('signup');
   const note = document.getElementById('signup-note');
-  if (!SIGNUP_ENDPOINT) note.textContent = 'Text sign-ups open soon.';
+  if (!SIGNUP_ENDPOINT) note.textContent = 'Email sign-ups open soon.';
   form.addEventListener('submit', async (e) => {
     e.preventDefault();
-    if (!SIGNUP_ENDPOINT) { note.textContent = 'Text sign-ups open soon. Check back!'; return; }
+    if (!SIGNUP_ENDPOINT) { note.textContent = 'Email sign-ups open soon. Check back!'; return; }
     const btn = form.querySelector('button');
     btn.disabled = true;
     try {
       const res = await fetch(SIGNUP_ENDPOINT, { method: 'POST', headers: { 'Content-Type': 'application/json', Accept: 'application/json' },
-        body: JSON.stringify({ phone: form.phone.value, consent: form.consent.checked }) });
-      note.textContent = res.ok ? "You're in. We'll text you when a unicorn day is coming." : 'Something went wrong. Please try again.';
+        body: JSON.stringify({ email: form.email.value, _subject: 'Unicorn Beach Day sign-up' }) });
+      note.textContent = res.ok ? "You're in. We'll email you when a unicorn day is coming." : 'Something went wrong. Please try again.';
       if (res.ok) form.reset();
     } catch { note.textContent = 'Something went wrong. Please try again.'; }
     btn.disabled = false;

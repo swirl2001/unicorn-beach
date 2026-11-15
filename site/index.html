@@ -58,7 +58,7 @@
   .day .name b { display: block; font-size: 12px; letter-spacing: .1em; text-transform: uppercase; }
   .day .name small { display: block; font-size: 12px; color: var(--muted); }
   .meter { position: relative; width: 12px; height: 72px; border-radius: 99px; background: var(--sea-soft); overflow: hidden; }
-  .meter i { position: absolute; left: 0; right: 0; bottom: 0; height: max(3px, calc(var(--p) * 1%)); background: var(--glow); border-radius: 99px; }
+  .meter i { position: absolute; left: 0; right: 0; bottom: 0; height: calc(var(--p) * 1%); background: var(--glow); border-radius: 99px; }
   .pct { font-weight: 700; font-size: 18px; font-variant-numeric: tabular-nums; }
   .facts { display: grid; gap: 4px; font-size: 13px; color: var(--muted); justify-items: center; }
   .facts span { display: inline-flex; align-items: center; gap: 5px; white-space: nowrap; }
@@ -101,7 +101,7 @@
       border-right: 0; border-bottom: 1px solid var(--line); padding: 12px 14px; }
     .day:last-child { border-bottom: 0; }
     .meter { width: auto; height: 8px; }
-    .meter i { top: 0; right: auto; height: auto; width: max(3px, calc(var(--p) * 1%)); }
+    .meter i { top: 0; right: auto; height: auto; width: calc(var(--p) * 1%); }
     .pct { text-align: right; }
     .facts { grid-column: 2 / -1; display: flex; flex-wrap: wrap; gap: 4px 12px; justify-items: start; }
     .facts .win { margin: 0; font-size: 13px; }
@@ -182,6 +182,8 @@
     rain: svg('<path d="M8 2s4 4.6 4 7.6A4 4 0 0 1 4 9.6C4 6.6 8 2 8 2z"/>'),
     warn: svg('<path d="M8 2.5l6 10.5H2z"/><path d="M8 7v2.5"/><path d="M8 11.4v.1"/>'),
   };
+  // Bar fill on a square-root scale so small chances still show, and differ: 1% -> 10%, 25% -> 50%. 0 -> empty.
+  const fill = (p) => (p > 0 ? Math.min(100, Math.sqrt(p) * 100) : 0);
   const pct = (p) => {
     const v = p * 100;
     return v >= 10 ? `${Math.round(v)}%` : v >= 1 ? `${v.toFixed(1)}%` : v > 0 ? '<1%' : '0%';
@@ -193,7 +195,7 @@
       const days = data.days || [];
       const best = days.reduce((a, d) => (!a || d.chance > a.chance ? d : a), null);
       const hero = document.getElementById('hero');
-      document.getElementById('ring').style.setProperty('--p', best ? Math.max(best.chance * 100, best.chance > 0 ? 2 : 0) : 0);
+      document.getElementById('ring').style.setProperty('--p', best ? fill(best.chance) : 0);
       document.getElementById('best-pct').textContent = best ? pct(best.chance) : '–';
 
       const title = document.getElementById('hero-title');
@@ -218,7 +220,7 @@
         return `
         <div class="day${d === bestDay && d.chance >= 0.1 ? ' best' : ''}">
           <div class="name"><b>${dow}</b><small>${rest.join(' ')}</small></div>
-          <div class="meter" role="img" aria-label="${pct(d.chance)} chance"><i style="--p:${Math.min(100, d.chance * 100)}"></i></div>
+          <div class="meter" role="img" aria-label="${pct(d.chance)} chance"><i style="--p:${fill(d.chance)}"></i></div>
           <div class="pct">${pct(d.chance)}</div>
           <div class="facts">
             <span class="win">${d.window}</span>

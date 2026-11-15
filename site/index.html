@@ -48,17 +48,27 @@
   .hero p { margin: 0; color: var(--muted); }
   .hero.go { border-color: var(--glow); box-shadow: 0 0 0 3px color-mix(in srgb, var(--glow) 30%, transparent); }
 
-  .days { display: grid; gap: 10px; }
-  .day { display: grid; grid-template-columns: 96px 1fr 56px; gap: 14px; align-items: center;
-    padding: 14px 16px; background: var(--surface); border: 1px solid var(--line); border-radius: 12px; }
-  .day .name { font-weight: 600; }
-  .day .name small { display: block; font-weight: 400; color: var(--muted); font-size: 13px; }
-  .bar { height: 8px; border-radius: 99px; background: var(--sea-soft); overflow: hidden; margin-bottom: 8px; }
-  .bar i { display: block; height: 100%; background: var(--glow); min-width: 3px; border-radius: 99px; }
-  .facts { font-size: 13px; color: var(--muted); display: flex; flex-wrap: wrap; gap: 4px 12px; }
+  /* Week: a row of 7 columns when there's room, a stacked list on phones */
+  .days { display: grid; grid-template-columns: repeat(7, minmax(0, 1fr)); background: var(--surface);
+    border: 1px solid var(--line); border-radius: var(--radius); overflow: hidden; }
+  .day { display: flex; flex-direction: column; align-items: center; gap: 8px; padding: 16px 6px 18px;
+    border-right: 1px solid var(--line); text-align: center; min-width: 0; }
+  .day:last-child { border-right: 0; }
+  .day.best { background: color-mix(in srgb, var(--glow) 14%, var(--surface)); }
+  .day .name b { display: block; font-size: 12px; letter-spacing: .1em; text-transform: uppercase; }
+  .day .name small { display: block; font-size: 12px; color: var(--muted); }
+  .meter { position: relative; width: 12px; height: 72px; border-radius: 99px; background: var(--sea-soft); overflow: hidden; }
+  .meter i { position: absolute; left: 0; right: 0; bottom: 0; height: max(3px, calc(var(--p) * 1%)); background: var(--glow); border-radius: 99px; }
+  .pct { font-weight: 700; font-size: 18px; font-variant-numeric: tabular-nums; }
+  .facts { display: grid; gap: 4px; font-size: 13px; color: var(--muted); justify-items: center; }
+  .facts span { display: inline-flex; align-items: center; gap: 5px; white-space: nowrap; }
   .facts b { color: var(--ink); font-weight: 600; }
-  .tag { color: var(--warn); font-weight: 600; }
-  .pct { text-align: right; font-weight: 700; font-size: 18px; font-variant-numeric: tabular-nums; }
+  .facts svg { width: 14px; height: 14px; flex: none; color: var(--sea); }
+  .facts .win { font-size: 12px; margin-bottom: 2px; }
+  .facts .tag, .facts .tag svg { color: var(--warn); font-weight: 600; }
+  .legend { display: flex; flex-wrap: wrap; gap: 6px 16px; justify-content: center; margin: 10px 0 0; font-size: 12px; color: var(--muted); }
+  .legend span { display: inline-flex; align-items: center; gap: 5px; }
+  .legend svg { width: 13px; height: 13px; color: var(--sea); }
 
   section { margin-top: 40px; }
   section.signup { margin: 0 0 28px; }
@@ -85,11 +95,19 @@
   footer { margin-top: 48px; font-size: 13px; color: var(--muted); }
   footer a { color: inherit; }
 
+  @media (max-width: 700px) {
+    .days { grid-template-columns: 1fr; }
+    .day { display: grid; grid-template-columns: 64px 1fr 52px; align-items: center; gap: 6px 12px; text-align: left;
+      border-right: 0; border-bottom: 1px solid var(--line); padding: 12px 14px; }
+    .day:last-child { border-bottom: 0; }
+    .meter { width: auto; height: 8px; }
+    .meter i { top: 0; right: auto; height: auto; width: max(3px, calc(var(--p) * 1%)); }
+    .pct { text-align: right; }
+    .facts { grid-column: 2 / -1; display: flex; flex-wrap: wrap; gap: 4px 12px; justify-items: start; }
+    .facts .win { margin: 0; font-size: 13px; }
+  }
   @media (max-width: 560px) {
     .hero { grid-template-columns: 1fr; justify-items: start; padding: 20px; }
-    .day { grid-template-columns: 1fr 52px; }
-    .day .name { grid-column: 1 / -1; display: flex; gap: 8px; align-items: baseline; }
-    .day .name small { display: inline; }
     .rules { grid-template-columns: 1fr; }
   }
 </style>
@@ -130,6 +148,7 @@
   </section>
 
   <div class="days" id="days" aria-live="polite"></div>
+  <p class="legend" id="legend" hidden></p>
 
   <section>
     <h2>What's a unicorn day?</h2>
@@ -155,6 +174,14 @@
   // Formspree form that collects sign-up emails (see README). Empty = sign-ups not open yet.
   const SIGNUP_ENDPOINT = 'https://formspree.io/f/mljbjrnl';
 
+  const svg = (d) => `<svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">${d}</svg>`;
+  const ICON = {
+    wave: svg('<path d="M1.5 6c1.6 0 1.6-1.5 3.25-1.5S6.4 6 8 6s1.6-1.5 3.25-1.5S12.9 6 14.5 6"/><path d="M1.5 11c1.6 0 1.6-1.5 3.25-1.5S6.4 11 8 11s1.6-1.5 3.25-1.5S12.9 11 14.5 11"/>'),
+    wind: svg('<path d="M2 6h8.5a2 2 0 1 0-2-2"/><path d="M2 10h10.5a2 2 0 1 1-2 2"/>'),
+    gust: svg('<path d="M2 4.5h7"/><path d="M2 8h12"/><path d="M2 11.5h8"/><path d="M11.5 6l2.5 2-2.5 2"/>'),
+    rain: svg('<path d="M8 2s4 4.6 4 7.6A4 4 0 0 1 4 9.6C4 6.6 8 2 8 2z"/>'),
+    warn: svg('<path d="M8 2.5l6 10.5H2z"/><path d="M8 7v2.5"/><path d="M8 11.4v.1"/>'),
+  };
   const pct = (p) => {
     const v = p * 100;
     return v >= 10 ? `${Math.round(v)}%` : v >= 1 ? `${v.toFixed(1)}%` : v > 0 ? '<1%' : '0%';
@@ -185,21 +212,27 @@
           : 'No forecast available right now.';
       }
 
-      document.getElementById('days').innerHTML = days.map((d) => `
-        <div class="day">
-          <div class="name">${d.label.split(' ')[0]}<small>${d.label.split(' ').slice(1).join(' ')}</small></div>
-          <div>
-            <div class="bar"><i style="width:${Math.min(100, d.chance * 100)}%"></i></div>
-            <div class="facts">
-              <span>${d.window}</span>
-              <span>waves <b>${d.wave_ft} ft</b></span>
-              <span>wind <b>${d.wind_mph}</b>, gusts ${d.gust_mph} mph</span>
-              ${d.rain_pct >= 20 ? `<span>rain ${d.rain_pct}%</span>` : ''}
-              ${d.advisory.length ? `<span class="tag">${d.advisory.join(', ')}</span>` : ''}
-            </div>
-          </div>
+      const bestDay = days.reduce((a, d) => (!a || d.chance > a.chance ? d : a), null);
+      document.getElementById('days').innerHTML = days.map((d) => {
+        const [dow, ...rest] = d.label.split(' ');
+        return `
+        <div class="day${d === bestDay && d.chance >= 0.1 ? ' best' : ''}">
+          <div class="name"><b>${dow}</b><small>${rest.join(' ')}</small></div>
+          <div class="meter" role="img" aria-label="${pct(d.chance)} chance"><i style="--p:${Math.min(100, d.chance * 100)}"></i></div>
           <div class="pct">${pct(d.chance)}</div>
-        </div>`).join('');
+          <div class="facts">
+            <span class="win">${d.window}</span>
+            <span title="Waves off China Beach" aria-label="Waves ${d.wave_ft} feet">${ICON.wave}<b>${d.wave_ft} ft</b></span>
+            <span title="Wind" aria-label="Wind ${d.wind_mph} miles per hour">${ICON.wind}<b>${d.wind_mph}</b> mph</span>
+            <span title="Gusts" aria-label="Gusts ${d.gust_mph} miles per hour">${ICON.gust}${d.gust_mph} mph</span>
+            <span title="Chance of rain" aria-label="Rain chance ${d.rain_pct} percent">${ICON.rain}${d.rain_pct}%</span>
+            ${d.advisory.length ? `<span class="tag" title="${d.advisory.join(', ')}">${ICON.warn}Advisory</span>` : ''}
+          </div>
+        </div>`;
+      }).join('');
+      const legend = document.getElementById('legend');
+      legend.innerHTML = `<span>${ICON.wave}Waves</span><span>${ICON.wind}Wind</span><span>${ICON.gust}Gusts</span><span>${ICON.rain}Rain chance</span>`;
+      legend.hidden = false;
 
       document.getElementById('updated').textContent = `Updated ${data.generated_local} Pacific. Checks run every evening and early morning.`;
     })

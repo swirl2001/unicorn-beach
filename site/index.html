@@ -211,6 +211,20 @@
   const note = document.getElementById('signup-note');
   if (!SIGNUP_ENDPOINT) note.textContent = 'Email sign-ups open soon.';
   const done = document.getElementById('signed-up');
+  // Remember sign-ups in this browser so returning visitors see "You're in!" instead of the form.
+  const STORE_KEY = 'unicorn-signups';
+  const saved = () => { try { return JSON.parse(localStorage.getItem(STORE_KEY)) || []; } catch { return []; } };
+  const remember = (email) => {
+    try { localStorage.setItem(STORE_KEY, JSON.stringify([...new Set([...saved(), email])])); } catch {}
+  };
+  const showDone = (emails, focus) => {
+    document.getElementById('signed-up-email').textContent =
+      emails.length > 2 ? `${emails.slice(0, -1).join(', ')} and ${emails.at(-1)}` : emails.join(' and ');
+    form.hidden = true;
+    done.hidden = false;
+    if (focus) done.querySelector('.done').focus();
+  };
+  if (saved().length) showDone(saved(), false);
   document.getElementById('add-another').addEventListener('click', () => {
     done.hidden = true;
     form.hidden = false;
@@ -225,12 +239,11 @@
       const res = await fetch(SIGNUP_ENDPOINT, { method: 'POST', headers: { 'Content-Type': 'application/json', Accept: 'application/json' },
         body: JSON.stringify({ email: form.email.value, _subject: 'Unicorn Beach Day sign-up' }) });
       if (res.ok) {
-        document.getElementById('signed-up-email').textContent = form.email.value;
+        const email = form.email.value.trim();
+        remember(email);
         form.reset();
         note.textContent = '';
-        form.hidden = true;
-        done.hidden = false;
-        done.querySelector('.done').focus();
+        showDone(saved().length ? saved() : [email], true);
       } else {
         note.textContent = 'Something went wrong. Please try again.';
       }

@@ -78,6 +78,10 @@
     font: inherit; font-weight: 600; cursor: pointer; }
   button:disabled { opacity: .5; cursor: default; }
     .note { font-size: 14px; }
+  .signed-up { display: grid; gap: 6px; justify-items: start; }
+  .signed-up[hidden], form[hidden] { display: none; }
+  .done { margin: 0; font-size: 22px; font-weight: 700; letter-spacing: -0.01em; outline: none; }
+  button.link { height: auto; padding: 4px 0; background: none; color: var(--sea); font-weight: 600; text-decoration: underline; text-underline-offset: 3px; }
   footer { margin-top: 48px; font-size: 13px; color: var(--muted); }
   footer a { color: inherit; }
 
@@ -117,6 +121,11 @@
         <p class="muted" style="margin:0;font-size:13px">About two emails a year, only when a unicorn day is coming. Reply "stop" anytime to unsubscribe.</p>
         <p class="note muted" id="signup-note" style="margin:0"></p>
       </form>
+      <div class="signed-up" id="signed-up" hidden>
+        <p class="done" tabindex="-1">You're in!</p>
+        <p class="muted" style="margin:0">We'll email <b id="signed-up-email"></b> when a unicorn day is coming.</p>
+        <button type="button" class="link" id="add-another">Add another email</button>
+      </div>
     </div>
   </section>
 
@@ -201,6 +210,12 @@
   const form = document.getElementById('signup');
   const note = document.getElementById('signup-note');
   if (!SIGNUP_ENDPOINT) note.textContent = 'Email sign-ups open soon.';
+  const done = document.getElementById('signed-up');
+  document.getElementById('add-another').addEventListener('click', () => {
+    done.hidden = true;
+    form.hidden = false;
+    form.email.focus();
+  });
   form.addEventListener('submit', async (e) => {
     e.preventDefault();
     if (!SIGNUP_ENDPOINT) { note.textContent = 'Email sign-ups open soon. Check back!'; return; }
@@ -209,8 +224,16 @@
     try {
       const res = await fetch(SIGNUP_ENDPOINT, { method: 'POST', headers: { 'Content-Type': 'application/json', Accept: 'application/json' },
         body: JSON.stringify({ email: form.email.value, _subject: 'Unicorn Beach Day sign-up' }) });
-      note.textContent = res.ok ? "You're in. We'll email you when a unicorn day is coming." : 'Something went wrong. Please try again.';
-      if (res.ok) form.reset();
+      if (res.ok) {
+        document.getElementById('signed-up-email').textContent = form.email.value;
+        form.reset();
+        note.textContent = '';
+        form.hidden = true;
+        done.hidden = false;
+        done.querySelector('.done').focus();
+      } else {
+        note.textContent = 'Something went wrong. Please try again.';
+      }
     } catch { note.textContent = 'Something went wrong. Please try again.'; }
     btn.disabled = false;
   });

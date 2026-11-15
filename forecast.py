@@ -337,8 +337,8 @@ def main():
     page = os.environ.get('PAGE_URL', '')
     for d in data['days']:
         if d['within_48h'] and d['chance'] >= ALERT_CHANCE and d['date'] not in state['alerted']:
-            subject = f"Play hooky {d['label']}: China Beach looks like a unicorn day"
-            body = (f"China Beach looks glassy {d['label']}, {d['window']}.\n\n"
+            subject = f"Drop everything and go to the beach {d['label']}! China Beach is glassy"
+            body = (f"Skip work. Grab your towel. China Beach looks like a unicorn day {d['label']}, {d['window']}.\n\n"
                     f"Waves about {d['wave_ft']} ft, wind {d['wind_mph']} mph, gusts {d['gust_mph']} mph. "
                     f"Chance {round(d['chance'] * 100)}%.\n\n"
                     f"This happens about twice a year. Drop everything and get out there.\n\n"

@@ -1,6 +1,6 @@
 {
- "generated": "2026-11-15T07:53:48.852573+00:00",
- "generated_local": "Sat Nov 14, 11:53 PM",
+ "generated": "2026-11-15T07:55:45.318073+00:00",
+ "generated_local": "Sat Nov 14, 11:55 PM",
  "definition": {
   "wave_max_ft": 1.0,
   "wind_max_mph": 5.6,
@@ -24,11 +24,6 @@
    ],
    "within_48h": true,
    "tides": [
-    {
-     "time": "4:47am",
-     "type": "high",
-     "ft": 4.4
-    },
     {
      "time": "9:14am",
      "type": "low",
@@ -60,11 +55,6 @@
    "within_48h": true,
    "tides": [
     {
-     "time": "5:33am",
-     "type": "high",
-     "ft": 4.5
-    },
-    {
      "time": "10:38am",
      "type": "low",
      "ft": 3.4
@@ -94,11 +84,6 @@
    "advisory": [],
    "within_48h": false,
    "tides": [
-    {
-     "time": "6:12am",
-     "type": "high",
-     "ft": 4.7
-    },
     {
      "time": "11:49am",
      "type": "low",
@@ -130,11 +115,6 @@
    "within_48h": false,
    "tides": [
     {
-     "time": "6:45am",
-     "type": "high",
-     "ft": 4.9
-    },
-    {
      "time": "12:45pm",
      "type": "low",
      "ft": 2.4
@@ -159,11 +139,6 @@
    "advisory": [],
    "within_48h": false,
    "tides": [
-    {
-     "time": "12:12am",
-     "type": "low",
-     "ft": 1.0
-    },
     {
      "time": "7:15am",
      "type": "high",
@@ -195,11 +170,6 @@
    "within_48h": false,
    "tides": [
     {
-     "time": "12:57am",
-     "type": "low",
-     "ft": 1.3
-    },
-    {
      "time": "7:45am",
      "type": "high",
      "ft": 5.6
@@ -229,11 +199,6 @@
    "advisory": [],
    "within_48h": false,
    "tides": [
-    {
-     "time": "1:40am",
-     "type": "low",
-     "ft": 1.7
-    },
     {
      "time": "8:15am",
      "type": "high",

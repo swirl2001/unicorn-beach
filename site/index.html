@@ -390,7 +390,7 @@
         </div>`;
       }).join('');
       const legend = document.getElementById('legend');
-      legend.innerHTML = `<span>${ICON.wave}Waves</span><span>${ICON.wind}Wind</span><span>${ICON.gust}Gusts</span><span>${ICON.rain}Rain chance</span><span class="more">More waves, lines or drops = more</span>`;
+      legend.innerHTML = `<span>${ICON.wave}Waves</span><span>${ICON.wind}Wind</span><span>${ICON.gust}Gusts</span><span>${ICON.rain}Rain chance</span>`;
       legend.hidden = false;
 
       if (days.some((d) => d.tides && d.tides.length)) {

@@ -1,6 +1,6 @@
 {
- "generated": "2026-11-15T22:47:15.593193+00:00",
- "generated_local": "Sun Nov 15, 2:47 PM",
+ "generated": "2026-11-16T01:30:33.015092+00:00",
+ "generated_local": "Sun Nov 15, 5:30 PM",
  "definition": {
   "wave_max_ft": 1.0,
   "wind_max_mph": 5.6,
@@ -9,6 +9,121 @@
   "per_year": 2
  },
  "days": [
+  {
+   "date": "2026-11-15",
+   "label": "Sun Nov 15",
+   "chance": 0.0,
+   "window": "Too late today",
+   "late": true,
+   "wave_ft": null,
+   "wind_mph": null,
+   "gust_mph": null,
+   "rain_pct": null,
+   "wave_source": null,
+   "advisory": [],
+   "within_48h": false,
+   "tides": [
+    {
+     "time": "9:14am",
+     "type": "low",
+     "ft": 3.6
+    },
+    {
+     "time": "2:27pm",
+     "type": "high",
+     "ft": 4.9
+    },
+    {
+     "time": "9:39pm",
+     "type": "low",
+     "ft": 0.3
+    }
+   ],
+   "tide_curve": [
+    [
+     6,
+     4.24
+    ],
+    [
+     7,
+     3.97
+    ],
+    [
+     8,
+     3.72
+    ],
+    [
+     9,
+     3.6
+    ],
+    [
+     10,
+     3.64
+    ],
+    [
+     11,
+     3.85
+    ],
+    [
+     12,
+     4.21
+    ],
+    [
+     13,
+     4.59
+    ],
+    [
+     14,
+     4.84
+    ],
+    [
+     15,
+     4.82
+    ],
+    [
+     16,
+     4.45
+    ],
+    [
+     17,
+     3.7
+    ],
+    [
+     18,
+     2.7
+    ],
+    [
+     19,
+     1.68
+    ],
+    [
+     20,
+     0.86
+    ],
+    [
+     21,
+     0.4
+    ],
+    [
+     22,
+     0.34
+    ],
+    [
+     23,
+     0.63
+    ],
+    [
+     24,
+     1.22
+    ]
+   ],
+   "sunrise": 6.83,
+   "tide_range": {
+    "ft": 4.6,
+    "high": 4.9,
+    "low": 0.3
+   }
+  },
   {
    "date": "2026-11-16",
    "label": "Mon Nov 16",
@@ -351,7 +466,7 @@
    "label": "Thu Nov 19",
    "chance": 0.0,
    "window": "7am\u201310am",
-   "wave_ft": 3.3,
+   "wave_ft": 3.2,
    "wind_mph": 25,
    "gust_mph": 28,
    "rain_pct": 91,
@@ -463,9 +578,9 @@
   {
    "date": "2026-11-20",
    "label": "Fri Nov 20",
-   "chance": 0.0,
+   "chance": 0.005,
    "window": "2pm\u20135pm",
-   "wave_ft": 2.4,
+   "wave_ft": 1.9,
    "wind_mph": 6,
    "gust_mph": 8,
    "rain_pct": 19,
@@ -573,12 +688,12 @@
   {
    "date": "2026-11-21",
    "label": "Sat Nov 21",
-   "chance": 0.78,
+   "chance": 0.0,
    "window": "7am\u201310am",
-   "wave_ft": 0.8,
-   "wind_mph": 3,
-   "gust_mph": 6,
-   "rain_pct": 5,
+   "wave_ft": 2.6,
+   "wind_mph": 13,
+   "gust_mph": 15,
+   "rain_pct": 28,
    "wave_source": "offshore",
    "advisory": [],
    "within_48h": false,

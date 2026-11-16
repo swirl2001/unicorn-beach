@@ -256,8 +256,8 @@ def build(now=None):
         by_day.setdefault(h['t'].astimezone(PT).date(), []).append(h)
 
     days = []
-    for d in sorted(by_day):
-        hs_ = by_day[d]
+    for d in (today + timedelta(days=i) for i in range(7)):  # always 7 calendar days, today first
+        hs_ = by_day.get(d, [])
         best = None
         for k in range(len(hs_) - HOURS_NEEDED + 1):
             run = hs_[k:k + HOURS_NEEDED]
@@ -269,7 +269,11 @@ def build(now=None):
             key = (round(p, 4), -excess)
             if best is None or key > best[0]:
                 best = (key, p, run)
-        if not best:
+        if not best:  # e.g. late afternoon: fewer than 3 daylight hours left today
+            days.append(dict(date=d.isoformat(), label=d.strftime('%a %b %-d'), chance=0.0,
+                             window='Too late today' if d == today else 'No forecast yet', late=True,
+                             wave_ft=None, wind_mph=None, gust_mph=None, rain_pct=None, wave_source=None,
+                             advisory=[], within_48h=False))
             continue
         _, p, run = best
         days.append(dict(

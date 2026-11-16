@@ -56,6 +56,7 @@
     padding: 16px 6px 18px; border-right: 1px solid var(--line); text-align: center; min-width: 0; }
   .day .note { font-size: 12px; line-height: 1.35; color: var(--ink); }
   .day:last-child { border-right: 0; }
+  .day.late { opacity: .5; }
   .day.best { background: color-mix(in srgb, var(--glow) 14%, var(--surface)); }
   .day .name b { display: block; font-size: 12px; letter-spacing: .1em; text-transform: uppercase; }
   .day .name small { display: block; font-size: 12px; color: var(--muted); }
@@ -288,7 +289,7 @@
     .then((r) => r.json())
     .then((data) => {
       const days = data.days || [];
-      const best = days.reduce((a, d) => (!a || d.chance > a.chance ? d : a), null);
+      const best = days.filter((d) => !d.late).reduce((a, d) => (!a || d.chance > a.chance ? d : a), null);
       const hero = document.getElementById('hero');
       document.getElementById('ring').style.setProperty('--p', best ? fill(best.chance) : 0);
       document.getElementById('best-pct').textContent = best ? pct(best.chance) : '–';
@@ -311,6 +312,7 @@
 
       // One-line daily synopsis from the day's best window
       const synopsis = (d) => {
+        if (d.late) return d.window === 'Too late today' ? 'Not enough daylight left' : 'Forecast coming soon';
         if (d.chance >= 0.5) return 'Glassy and calm. Go!';
         const waves = d.wave_ft <= 1 ? 'tiny waves' : d.wave_ft <= 2.5 ? 'small waves' : d.wave_ft <= 5 ? 'big surf' : 'huge surf';
         const wind = d.wind_mph <= 5.6 && d.gust_mph <= 8.9 ? 'calm wind' : d.wind_mph <= 12 ? 'breezy' : 'windy';
@@ -321,21 +323,21 @@
         const text = bits.slice(0, 3).join(', ');
         return text.charAt(0).toUpperCase() + text.slice(1);
       };
-      const bestDay = days.reduce((a, d) => (!a || d.chance > a.chance ? d : a), null);
+      const bestDay = days.filter((d) => !d.late).reduce((a, d) => (!a || d.chance > a.chance ? d : a), null);
       document.getElementById('days').innerHTML = days.map((d) => {
         const [dow, ...rest] = d.label.split(' ');
         return `
-        <div class="day${d === bestDay && d.chance >= 0.1 ? ' best' : ''}">
+        <div class="day${d === bestDay && d.chance >= 0.1 ? ' best' : ''}${d.late ? ' late' : ''}">
           <div class="name"><b>${dow}</b><small>${rest.join(' ')}</small></div>
           <div class="meter" role="img" aria-label="${pct(d.chance)} chance"><i style="--p:${barFill(d.chance)}"></i></div>
           <div class="pct">${pct(d.chance)}</div>
           <div class="note">${synopsis(d)}</div>
           <div class="facts">
             <span class="win">${d.window}</span>
-            <span title="Waves off China Beach" aria-label="Waves ${d.wave_ft} feet">${ICON.wave}<b>${d.wave_ft} ft</b></span>
-            <span title="Wind" aria-label="Wind ${d.wind_mph} miles per hour">${ICON.wind}<b>${d.wind_mph}</b> mph</span>
-            <span title="Gusts" aria-label="Gusts ${d.gust_mph} miles per hour">${ICON.gust}${d.gust_mph} mph</span>
-            <span title="Chance of rain" aria-label="Rain chance ${d.rain_pct} percent">${ICON.rain}${d.rain_pct}%</span>
+            <span title="Waves off China Beach" aria-label="Waves ${d.wave_ft} feet">${ICON.wave}<b>${d.wave_ft ?? '–'}${d.wave_ft != null ? ' ft' : ''}</b></span>
+            <span title="Wind" aria-label="Wind ${d.wind_mph} miles per hour">${ICON.wind}${d.wind_mph != null ? `<b>${d.wind_mph}</b> mph` : '–'}</span>
+            <span title="Gusts" aria-label="Gusts ${d.gust_mph} miles per hour">${ICON.gust}${d.gust_mph != null ? `${d.gust_mph} mph` : '–'}</span>
+            <span title="Chance of rain" aria-label="Rain chance ${d.rain_pct} percent">${ICON.rain}${d.rain_pct != null ? `${d.rain_pct}%` : '–'}</span>
             ${d.advisory.length ? `<span class="tag" title="${d.advisory.join(', ')}">${ICON.warn}Advisory</span>` : ''}
           </div>
         </div>`;

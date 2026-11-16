@@ -118,6 +118,15 @@
   .signed-up[hidden], form[hidden], section[hidden] { display: none; }
   .done { margin: 0; font-size: 22px; font-weight: 700; letter-spacing: -0.01em; outline: none; }
   button.link { height: auto; padding: 4px 0; background: none; color: var(--sea); font-weight: 600; text-decoration: underline; text-underline-offset: 3px; }
+  /* Notes on the data */
+  .notes .card { background: var(--surface); border: 1px solid var(--line); border-radius: var(--radius); padding: 22px; }
+  .notes h3 { margin: 18px 0 6px; font-size: 15px; font-weight: 700; }
+  .notes h3:first-child { margin-top: 0; }
+  .notes li { font-size: 14px; color: var(--muted); }
+  .notes ul { margin: 0; padding-left: 18px; }
+  .notes li + li { margin-top: 4px; }
+  .notes b { color: var(--ink); font-weight: 600; }
+
   footer { margin-top: 48px; font-size: 13px; color: var(--muted); }
   footer a { color: inherit; }
 
@@ -206,6 +215,45 @@
     </div>
   </section>
 
+
+  <section class="notes" id="notes">
+    <h2>Notes on the data</h2>
+    <div class="card">
+      <h3>What counts as a unicorn day</h3>
+      <ul>
+        <li>At least <b>3 daylight hours in a row</b> with waves of <b>1 ft or less</b> just off China Beach, wind of <b>5.6 mph or less</b> and gusts of <b>8.9 mph or less</b>.</li>
+        <li>From 2021 to 2025 that happened about <b>twice a year</b>, mostly on October–January mornings.</li>
+      </ul>
+      <h3>Where the history comes from</h3>
+      <ul>
+        <li><b>Waves:</b> CDIP's wave model for the spot just off China Beach (MOP SF054, about 10 m deep), hourly, 2021–2025. CDIP is Scripps Institution of Oceanography's wave program.</li>
+        <li><b>Wind:</b> the Fort Point weather station at the Golden Gate (NOAA NDBC FTPC1).</li>
+        <li>The limits above were chosen so that only the rare, truly glassy days qualify.</li>
+      </ul>
+      <h3>The live forecast</h3>
+      <ul>
+        <li>Runs automatically at about 5:17 am and 5:17 pm Pacific on GitHub Actions.</li>
+        <li><b>Waves, days 1–3:</b> CDIP's wave forecast for the grid cell off China Beach. <b>Days 4–7:</b> Open-Meteo's offshore wave forecast × 0.37, the typical ratio of China Beach waves to the SF Bar buoy in 2021–2025.</li>
+        <li><b>Wind, gusts and rain chance:</b> National Weather Service hourly forecast for the beach. Active NWS marine warnings (small craft, high surf and the like) cut the chance to a fifth.</li>
+        <li><b>Daylight only:</b> hours count once the sun is 3° above the horizon.</li>
+      </ul>
+      <h3>How the chance is worked out</h3>
+      <ul>
+        <li>For each daylight hour: the chance that waves, wind and gusts all stay under the limits, allowing for forecast error that grows the further ahead it looks, times the chance it doesn't rain.</li>
+        <li>Each day shows its best 3-hour window, with that window's waves, wind, gusts and rain.</li>
+        <li>The short daily summary is written from those numbers: tiny waves (1 ft or less), small (up to 2.5 ft), big surf (up to 5 ft) or huge; calm wind (within the unicorn limits), breezy (up to 12 mph) or windy; plus rain likely (50%+) and surf advisory.</li>
+        <li>No archive of past forecasts was available to check these chances against real outcomes, so treat them as a careful estimate, not a tested probability.</li>
+      </ul>
+      <h3>Tides</h3>
+      <ul>
+        <li>NOAA tide predictions for Fort Point (station 9414290), sunrise to midnight, in feet above mean lower low water. Range is the day's highest tide minus its lowest.</li>
+      </ul>
+      <h3>Alerts</h3>
+      <ul>
+        <li>An email goes out once per date when a day within 48 hours reaches a 50% chance.</li>
+      </ul>
+    </div>
+  </section>
 
   <footer>
     <p id="updated"></p>

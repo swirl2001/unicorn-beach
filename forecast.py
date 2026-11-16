@@ -341,13 +341,13 @@ def main():
     page = os.environ.get('PAGE_URL', '')
     for d in data['days']:
         if d['within_48h'] and d['chance'] >= ALERT_CHANCE and d['date'] not in state['alerted']:
-            subject = f"Drop everything and go to the beach {d['label']}! China Beach is glassy"
-            body = (f"Skip work. Grab your towel. China Beach looks like a unicorn day {d['label']}, {d['window']}.\n\n"
+            subject = f"Drop everything and go crabbing {d['label']}! The ocean is chill at China Beach"
+            body = (f"Skip work. Grab your crab pots and the kayak. China Beach looks like a unicorn day {d['label']}, {d['window']}.\n\n"
                     f"Waves about {d['wave_ft']} ft, wind {d['wind_mph']} mph, gusts {d['gust_mph']} mph. "
                     f"Chance {round(d['chance'] * 100)}%.\n\n"
-                    f"This happens about twice a year. Drop everything and get out there.\n\n"
+                    f"Flat water like this happens about twice a year. Get out on it.\n\n"
                     f"{page}\n\n"
-                    "Check currents and shorebreak on the beach yourself; this is a forecast, not a safety call.\n"
+                    "Check currents and shorebreak yourself before you launch, and wear a PFD; this is a forecast, not a safety call.\n"
                     "Reply 'stop' to unsubscribe.")
             if send_emails(subject, body) or os.environ.get('MARK_DRY_RUN'):
                 state['alerted'].append(d['date'])

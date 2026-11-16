@@ -101,6 +101,7 @@
   .legend a { color: inherit; }
   .legend { display: flex; flex-wrap: wrap; gap: 6px 16px; justify-content: center; margin: 10px 0 0; font-size: 12px; color: var(--muted); }
   .legend span { display: inline-flex; align-items: center; gap: 5px; }
+  .legend .more { flex-basis: 100%; justify-content: center; font-style: italic; }
   .legend svg { width: 13px; height: 13px; color: var(--sea); }
 
   section { margin-top: 40px; }
@@ -282,6 +283,39 @@
     down: svg('<path d="M8 3v10"/><path d="M4 9l4 4 4-4"/>'),
     warn: svg('<path d="M8 2.5l6 10.5H2z"/><path d="M8 7v2.5"/><path d="M8 11.4v.1"/>'),
   };
+  // Graded icons: 1, 2 or 3 marks for a little, more, or a lot (see legend)
+  const DROP = 'M8 2s4 4.6 4 7.6A4 4 0 0 1 4 9.6C4 6.6 8 2 8 2z';
+  const drop = (x, y, k) => `<path stroke-width="${(1.5 / k).toFixed(2)}" transform="translate(${x} ${y}) scale(${k})" d="${DROP}"/>`;
+  const lvl = (x, a, b) => (x == null ? 1 : x < a ? 1 : x < b ? 2 : 3);
+  const GRADED = {
+    rain: [
+      svg(drop(0, 0, 1)),
+      svg(drop(-1.6, 2.6, 0.66) + drop(5.4, -0.6, 0.66)),
+      svg(drop(-2.4, 4, 0.56) + drop(2.4, -0.6, 0.56) + drop(7.2, 4, 0.56)),
+    ],
+    wind: [
+      svg('<path d="M2 8h8.5a2 2 0 1 0-2-2"/>'),
+      svg('<path d="M2 6h8.5a2 2 0 1 0-2-2"/><path d="M2 10h10.5a2 2 0 1 1-2 2"/>'),
+      svg('<path d="M2 4.5h8.5a2 2 0 1 0-2-2"/><path d="M2 8h11.5"/><path d="M2 11.5h8.5a2 2 0 1 1-2 2"/>'),
+    ],
+    gust: [
+      svg('<path d="M2 8h12"/><path d="M11.5 6l2.5 2-2.5 2"/>'),
+      svg('<path d="M2 6h8"/><path d="M2 9.5h12"/><path d="M11.5 7.5l2.5 2-2.5 2"/>'),
+      svg('<path d="M2 4.5h7"/><path d="M2 8h12"/><path d="M2 11.5h8"/><path d="M11.5 6l2.5 2-2.5 2"/>'),
+    ],
+    wave: [
+      svg('<path d="M1.5 8.5c1.6 0 1.6-1.5 3.25-1.5S6.4 8.5 8 8.5s1.6-1.5 3.25-1.5S12.9 8.5 14.5 8.5"/>'),
+      svg('<path d="M1.5 6c1.6 0 1.6-1.5 3.25-1.5S6.4 6 8 6s1.6-1.5 3.25-1.5S12.9 6 14.5 6"/><path d="M1.5 11c1.6 0 1.6-1.5 3.25-1.5S6.4 11 8 11s1.6-1.5 3.25-1.5S12.9 11 14.5 11"/>'),
+      svg('<path d="M1.5 4c1.6 0 1.6-1.5 3.25-1.5S6.4 4 8 4s1.6-1.5 3.25-1.5S12.9 4 14.5 4"/><path d="M1.5 8.5c1.6 0 1.6-1.5 3.25-1.5S6.4 8.5 8 8.5s1.6-1.5 3.25-1.5S12.9 8.5 14.5 8.5"/><path d="M1.5 13c1.6 0 1.6-1.5 3.25-1.5S6.4 13 8 13s1.6-1.5 3.25-1.5S12.9 13 14.5 13"/>'),
+    ],
+    temp: [10.6, 7.6, 4.4].map((top) => svg(`<path d="M6.5 9.3V3.5a1.5 1.5 0 0 1 3 0v5.8a3 3 0 1 1-3 0z"/><path d="M8 11.5V${top}"/>`)),
+    fog: [
+      svg('<path d="M4.6 10.5h6.9a2.4 2.4 0 0 0 .2-4.8A3.4 3.4 0 0 0 5.2 6.1 2.2 2.2 0 0 0 4.6 10.5z"/>'),
+      svg('<path d="M4.6 9h6.9a2.4 2.4 0 0 0 .2-4.8A3.4 3.4 0 0 0 5.2 4.6 2.2 2.2 0 0 0 4.6 9z"/><path d="M3.5 12.5h9"/>'),
+      svg('<path d="M4.6 9h6.9a2.4 2.4 0 0 0 .2-4.8A3.4 3.4 0 0 0 5.2 4.6 2.2 2.2 0 0 0 4.6 9z"/><path d="M2.5 11.5h8"/><path d="M5.5 14h8"/>'),
+    ],
+  };
+  const gi = (kind, x, a, b) => GRADED[kind][lvl(x, a, b) - 1];
   // Ring: true to scale (10% fills a tenth), at least a thin 2% sliver above zero; 0 stays empty.
   const fill = (p) => (p > 0 ? Math.min(100, Math.max(2, p * 100)) : 0);
   // Day bars: gentle curve so small chances still differ (2% -> 6%, 10% -> 20%, 50% -> 62%, 100% -> 100%).
@@ -340,16 +374,16 @@
           <div class="note">${synopsis(d)}</div>
           <div class="facts">
             <span class="win">${d.window}</span>
-            <span title="Waves off China Beach" aria-label="Waves ${d.wave_ft} feet">${ICON.wave}<b>${d.wave_ft ?? '–'}${d.wave_ft != null ? ' ft' : ''}</b></span>
-            <span title="Wind" aria-label="Wind ${d.wind_mph} miles per hour">${ICON.wind}${d.wind_mph != null ? `<b>${d.wind_mph}</b> mph` : '–'}</span>
-            <span title="Gusts" aria-label="Gusts ${d.gust_mph} miles per hour">${ICON.gust}${d.gust_mph != null ? `${d.gust_mph} mph` : '–'}</span>
-            <span title="Chance of rain" aria-label="Rain chance ${d.rain_pct} percent">${ICON.rain}${d.rain_pct != null ? `${d.rain_pct}%` : '–'}</span>
+            <span title="Waves off China Beach" aria-label="Waves ${d.wave_ft} feet">${gi('wave', d.wave_ft, 1.01, 2.6)}<b>${d.wave_ft ?? '–'}${d.wave_ft != null ? ' ft' : ''}</b></span>
+            <span title="Wind" aria-label="Wind ${d.wind_mph} miles per hour">${gi('wind', d.wind_mph, 8, 15)}${d.wind_mph != null ? `<b>${d.wind_mph}</b> mph` : '–'}</span>
+            <span title="Gusts" aria-label="Gusts ${d.gust_mph} miles per hour">${gi('gust', d.gust_mph, 12, 20)}${d.gust_mph != null ? `${d.gust_mph} mph` : '–'}</span>
+            <span title="Chance of rain" aria-label="Rain chance ${d.rain_pct} percent">${gi('rain', d.rain_pct, 30, 60)}${d.rain_pct != null ? `${d.rain_pct}%` : '–'}</span>
             ${d.advisory.length ? `<span class="tag" title="${d.advisory.join(', ')}">${ICON.warn}Advisory</span>` : ''}
           </div>
         </div>`;
       }).join('');
       const legend = document.getElementById('legend');
-      legend.innerHTML = `<span>${ICON.wave}Waves</span><span>${ICON.wind}Wind</span><span>${ICON.gust}Gusts</span><span>${ICON.rain}Rain chance</span>`;
+      legend.innerHTML = `<span>${ICON.wave}Waves</span><span>${ICON.wind}Wind</span><span>${ICON.gust}Gusts</span><span>${ICON.rain}Rain chance</span><span class="more">More waves, lines or drops = more</span>`;
       legend.hidden = false;
 
       if (days.some((d) => d.tides && d.tides.length)) {

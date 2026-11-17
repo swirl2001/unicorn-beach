@@ -1,6 +1,6 @@
 {
- "generated": "2026-11-16T22:55:04.468437+00:00",
- "generated_local": "Mon Nov 16, 2:55 PM",
+ "generated": "2026-11-17T09:14:48.363578+00:00",
+ "generated_local": "Tue Nov 17, 1:14 AM",
  "definition": {
   "wave_max_ft": 1.0,
   "wind_max_mph": 5.6,
@@ -10,129 +10,14 @@
  },
  "days": [
   {
-   "date": "2026-11-16",
-   "label": "Mon Nov 16",
-   "chance": 0.0,
-   "window": "Too late today",
-   "late": true,
-   "wave_ft": null,
-   "wind_mph": null,
-   "gust_mph": null,
-   "rain_pct": null,
-   "wave_source": null,
-   "advisory": [],
-   "within_48h": false,
-   "tides": [
-    {
-     "time": "10:38am",
-     "type": "low",
-     "ft": 3.4
-    },
-    {
-     "time": "3:31pm",
-     "type": "high",
-     "ft": 4.5
-    },
-    {
-     "time": "10:32pm",
-     "type": "low",
-     "ft": 0.5
-    }
-   ],
-   "tide_curve": [
-    [
-     6,
-     4.46
-    ],
-    [
-     7,
-     4.25
-    ],
-    [
-     8,
-     3.92
-    ],
-    [
-     9,
-     3.6
-    ],
-    [
-     10,
-     3.41
-    ],
-    [
-     11,
-     3.38
-    ],
-    [
-     12,
-     3.55
-    ],
-    [
-     13,
-     3.89
-    ],
-    [
-     14,
-     4.25
-    ],
-    [
-     15,
-     4.5
-    ],
-    [
-     16,
-     4.5
-    ],
-    [
-     17,
-     4.16
-    ],
-    [
-     18,
-     3.49
-    ],
-    [
-     19,
-     2.6
-    ],
-    [
-     20,
-     1.69
-    ],
-    [
-     21,
-     0.96
-    ],
-    [
-     22,
-     0.57
-    ],
-    [
-     23,
-     0.56
-    ],
-    [
-     24,
-     0.89
-    ]
-   ],
-   "sunrise": 6.92,
-   "tide_range": {
-    "ft": 4.0,
-    "high": 4.5,
-    "low": 0.5
-   }
-  },
-  {
    "date": "2026-11-17",
    "label": "Tue Nov 17",
    "chance": 0.0,
    "window": "2pm\u20135pm",
    "wave_ft": 2.4,
-   "wind_mph": 7,
+   "wind_mph": 6,
    "gust_mph": 9,
-   "rain_pct": 5,
+   "rain_pct": 8,
    "wave_source": "cdip",
    "advisory": [],
    "within_48h": true,
@@ -242,11 +127,11 @@
    "date": "2026-11-18",
    "label": "Wed Nov 18",
    "chance": 0.0,
-   "window": "10am\u20131pm",
-   "wave_ft": 3.8,
-   "wind_mph": 16,
-   "gust_mph": 21,
-   "rain_pct": 77,
+   "window": "2pm\u20135pm",
+   "wave_ft": 3.6,
+   "wind_mph": 12,
+   "gust_mph": 15,
+   "rain_pct": 99,
    "wave_source": "cdip",
    "advisory": [],
    "within_48h": true,
@@ -351,11 +236,11 @@
    "date": "2026-11-19",
    "label": "Thu Nov 19",
    "chance": 0.0,
-   "window": "2pm\u20135pm",
-   "wave_ft": 3.6,
-   "wind_mph": 20,
-   "gust_mph": 22,
-   "rain_pct": 88,
+   "window": "7am\u201310am",
+   "wave_ft": 3.5,
+   "wind_mph": 21,
+   "gust_mph": 26,
+   "rain_pct": 99,
    "wave_source": "cdip",
    "advisory": [],
    "within_48h": false,
@@ -464,12 +349,12 @@
   {
    "date": "2026-11-20",
    "label": "Fri Nov 20",
-   "chance": 0.01,
+   "chance": 0.006,
    "window": "2pm\u20135pm",
-   "wave_ft": 1.8,
+   "wave_ft": 1.9,
    "wind_mph": 5,
    "gust_mph": 7,
-   "rain_pct": 7,
+   "rain_pct": 8,
    "wave_source": "offshore",
    "advisory": [],
    "within_48h": false,
@@ -575,11 +460,11 @@
    "date": "2026-11-21",
    "label": "Sat Nov 21",
    "chance": 0.0,
-   "window": "2pm\u20135pm",
-   "wave_ft": 2.0,
+   "window": "7am\u201310am",
+   "wave_ft": 1.5,
    "wind_mph": 16,
-   "gust_mph": 21,
-   "rain_pct": 71,
+   "gust_mph": 18,
+   "rain_pct": 34,
    "wave_source": "offshore",
    "advisory": [],
    "within_48h": false,
@@ -685,11 +570,11 @@
    "date": "2026-11-22",
    "label": "Sun Nov 22",
    "chance": 0.0,
-   "window": "1pm\u20134pm",
+   "window": "7am\u201310am",
    "wave_ft": 2.6,
-   "wind_mph": 7,
-   "gust_mph": 9,
-   "rain_pct": 57,
+   "wind_mph": 8,
+   "gust_mph": 10,
+   "rain_pct": 60,
    "wave_source": "offshore",
    "advisory": [],
    "within_48h": false,
@@ -790,11 +675,127 @@
     "high": 6.4,
     "low": -0.5
    }
+  },
+  {
+   "date": "2026-11-23",
+   "label": "Mon Nov 23",
+   "chance": 0.004,
+   "window": "2pm\u20135pm",
+   "wave_ft": 2.0,
+   "wind_mph": 7,
+   "gust_mph": 9,
+   "rain_pct": 28,
+   "wave_source": "offshore",
+   "advisory": [],
+   "within_48h": false,
+   "tides": [
+    {
+     "time": "9:25am",
+     "type": "high",
+     "ft": 6.7
+    },
+    {
+     "time": "4:18pm",
+     "type": "low",
+     "ft": -1.1
+    },
+    {
+     "time": "11:31pm",
+     "type": "high",
+     "ft": 4.8
+    }
+   ],
+   "tide_curve": [
+    [
+     7,
+     5.32
+    ],
+    [
+     8,
+     6.18
+    ],
+    [
+     9,
+     6.67
+    ],
+    [
+     10,
+     6.6
+    ],
+    [
+     11,
+     5.84
+    ],
+    [
+     12,
+     4.42
+    ],
+    [
+     13,
+     2.61
+    ],
+    [
+     14,
+     0.84
+    ],
+    [
+     15,
+     -0.48
+    ],
+    [
+     16,
+     -1.07
+    ],
+    [
+     17,
+     -0.94
+    ],
+    [
+     18,
+     -0.23
+    ],
+    [
+     19,
+     0.85
+    ],
+    [
+     20,
+     2.06
+    ],
+    [
+     21,
+     3.23
+    ],
+    [
+     22,
+     4.18
+    ],
+    [
+     23,
+     4.73
+    ],
+    [
+     24,
+     4.75
+    ]
+   ],
+   "sunrise": 7.0,
+   "tide_range": {
+    "ft": 7.8,
+    "high": 6.7,
+    "low": -1.1
+   }
   }
  ],
- "alerts": [],
+ "alerts": [
+  {
+   "event": "Gale Warning",
+   "start": "2026-11-17T21:00:00-08:00",
+   "end": "2026-11-18T09:00:00-08:00"
+  }
+ ],
  "sources": {
   "cdip_hours": 16,
-  "nws_updated": "2026-11-16T22:36:42+00:00"
+  "nws_updated": "2026-11-17T08:27:06+00:00"
  }
 }
